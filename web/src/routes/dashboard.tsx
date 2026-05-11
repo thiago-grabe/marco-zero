@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
 import { useActiveContract, useContracts } from "@/hooks/useContract";
 import { useContractStore } from "@/stores/contract";
 import { scenariosApi } from "@/lib/api/client";
@@ -13,15 +12,9 @@ export const Route = createFileRoute("/dashboard")({
 
 function Dashboard() {
   const navigate = useNavigate();
-  const { authenticated, logout } = useAuth();
-  const { data: contracts, isLoading: loadingContracts, isError: contractsError } = useContracts();
+  const { data: contracts, isLoading: loadingContracts } = useContracts();
   const { data: contract, isLoading: loadingContract } = useActiveContract();
   const { activeContractId, setActiveContractId } = useContractStore();
-
-  // Redirecionar para login se não autenticado ou se query falhou com 401
-  useEffect(() => {
-    if (!authenticated || contractsError) navigate({ to: "/login" });
-  }, [authenticated, contractsError, navigate]);
 
   // Quando contratos carregam: se não tem ativo, usar o primeiro; se não tem nenhum, ir para onboarding
   useEffect(() => {
@@ -38,11 +31,11 @@ function Dashboard() {
   const { data: scenarios } = useQuery({
     queryKey: ["scenarios", activeContractId],
     queryFn: () => scenariosApi.list(activeContractId!),
-    enabled: !!activeContractId && authenticated,
+    enabled: !!activeContractId,
     retry: false,
   });
 
-  if (!authenticated || loadingContracts || loadingContract) {
+  if (loadingContracts || loadingContract) {
     return <LoadingScreen />;
   }
 
@@ -96,12 +89,7 @@ function Dashboard() {
           <Link to="/scenarios" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
             Cenários
           </Link>
-          <button
-            onClick={() => { logout(); navigate({ to: "/login" }); }}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Sair
-          </button>
+          {/* Login/logout removido do fluxo open source */}
         </div>
       </nav>
 

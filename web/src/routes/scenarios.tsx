@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
 import { useActiveContract } from "@/hooks/useContract";
 import { useContractStore } from "@/stores/contract";
 import { scenariosApi, motorApi, type ScenarioProjection } from "@/lib/api/client";
@@ -19,7 +18,6 @@ interface SliderParams {
 
 function Scenarios() {
   const navigate = useNavigate();
-  const { authenticated } = useAuth();
   const { data: contract } = useActiveContract();
   const activeContractId = useContractStore((s) => s.activeContractId);
   const queryClient = useQueryClient();
@@ -32,10 +30,6 @@ function Scenarios() {
     mes_aporte_anual: 4,
   });
   const [liveProjection, setLiveProjection] = useState<ScenarioProjection | null>(null);
-
-  useEffect(() => {
-    if (!authenticated) navigate({ to: "/login" });
-  }, [authenticated, navigate]);
 
   const { data: scenarios, isLoading } = useQuery({
     queryKey: ["scenarios", activeContractId],

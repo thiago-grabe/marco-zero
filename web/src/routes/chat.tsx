@@ -1,6 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import { useActiveContract } from "@/hooks/useContract";
 import { useChat } from "@/hooks/useChat";
 
@@ -17,16 +16,10 @@ const SUGGESTIONS = [
 ];
 
 function ChatPage() {
-  const navigate = useNavigate();
-  const { authenticated } = useAuth();
   const { data: contract } = useActiveContract();
   const { messages, isStreaming, toolCalls, sendMessage, clearMessages } = useChat();
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!authenticated) navigate({ to: "/login" });
-  }, [authenticated, navigate]);
 
   // Auto-scroll ao receber novas mensagens
   useEffect(() => {
