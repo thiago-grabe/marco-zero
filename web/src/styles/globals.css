@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark premium — Marco Zero */
+
+    /* Superfícies */
+    --background:             0 0% 5%;      /* #0D0D0D */
+    --foreground:             0 0% 95%;     /* #F2F2F2 */
+
+    --card:                   0 0% 8%;      /* #141414 */
+    --card-foreground:        0 0% 95%;
+
+    --popover:                0 0% 10%;     /* #1A1A1A */
+    --popover-foreground:     0 0% 95%;
+
+    /* Âmbar — acento primário */
+    --primary:                38 92% 50%;   /* #F59E0B */
+    --primary-foreground:     0 0% 5%;
+
+    /* Secundário (surfaces de menor destaque) */
+    --secondary:              0 0% 12%;     /* #1F1F1F */
+    --secondary-foreground:   0 0% 85%;
+
+    /* Muted */
+    --muted:                  0 0% 14%;     /* #242424 */
+    --muted-foreground:       0 0% 52%;     /* #858585 */
+
+    /* Acento (igual ao primário) */
+    --accent:                 38 92% 50%;
+    --accent-foreground:      0 0% 5%;
+
+    /* Destrutivo */
+    --destructive:            0 65% 52%;    /* #E04040 */
+    --destructive-foreground: 0 0% 95%;
+
+    /* Bordas e inputs */
+    --border:                 0 0% 16%;     /* #292929 */
+    --input:                  0 0% 14%;
+    --ring:                   38 92% 50%;   /* focus ring: âmbar */
+
+    --radius:                 0.5rem;
+
+    /* Semântica financeira */
+    --gain:                   142 60% 42%;  /* #22A45D — verde desaturado */
+    --loss:                   0   65% 52%;  /* #E04040 */
+    --warning:                35  90% 50%;  /* #F0900A */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Números grandes usam serifa */
+  .font-financial {
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Scrollbar minimal */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}

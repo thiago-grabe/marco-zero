@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+*.egg
+
+# Node
+node_modules/
+dist/
+.next/
+.vercel/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Build artifacts
+web/dist/
+
+# Auto-gerados — não commitar
+web/src/lib/api/generated.ts
+web/src/routeTree.gen.ts
+
+# Docker
+postgres_data/
+
+# Logs de desenvolvimento
+logs/
+*.log
+
+# Misc
+*.zip

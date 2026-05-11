@@ -1,0 +1,185 @@
+"""
+Router /contracts — CRUD de contratos + estado calculado pelo motor.
+
+Cada resposta inclui campos computados pelo motor SAC/PRICE:
+  taxa_anual_efetiva, parcela_total, juros_proxima, data_quitacao.
+"""
+
+import uuid
+from datetime import date
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from db.models.contract import Contract, Property
+from db.rls import get_rls_session
+from middleware.auth import get_current_user_id
+from models.contract import (
+    ContractCreate,
+    ContractResponse,
+    ContractUpdate,
+)
+from motor import sac
+
+router = APIRouter(prefix="/contracts", tags=["contracts"])
+
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+def _build_response(contract: Contract) -> ContractResponse:
+    """Adiciona campos computados pelo motor ao model ORM."""
+    taxa = float(contract.taxa_mensal)
+    saldo = float(contract.saldo_devedor)
+    amort = float(contract.amortizacao_mensal)
+    mip = float(contract.mip_mensal)
+    dfi = float(contract.dfi_mensal)
+    prazo = contract.prazo_remanescente
+
+    juros_proxima = round(saldo * taxa, 2)
+    seguros = round(mip + dfi, 2)
+    parcela_total = round(amort + juros_proxima + seguros, 2)
+    taxa_anual = round((1 + taxa) ** 12 - 1, 6)
+
+    # Projeção base para data de quitação
+    proj = sac.project_scenario(
+        saldo=saldo,
+        prazo_remanescente=prazo,
+        taxa_mensal=taxa,
+        amortizacao_mensal=amort,
+        mip_mensal=mip,
+        dfi_mensal=dfi,
+        data_proxima_parcela=contract.data_proxima_parcela,
+    )
+
+    return ContractResponse(
+        id=contract.id,
+        property_id=contract.property_id,
+        apelido=contract.apelido,
+        banco=contract.banco,
+        sistema_amortizacao=contract.sistema_amortizacao,
+        taxa_mensal=taxa,
+        taxa_anual_efetiva=taxa_anual,
+        saldo_devedor=saldo,
+        amortizacao_mensal=amort,
+        mip_mensal=mip,
+        dfi_mensal=dfi,
+        seguros_mensal=seguros,
+        parcela_total=parcela_total,
+        juros_proxima=juros_proxima,
+        data_proxima_parcela=contract.data_proxima_parcela,
+        prazo_remanescente=prazo,
+        data_quitacao=proj["data_quitacao"],
+        valor_original=float(contract.valor_original) if contract.valor_original else None,
+        data_inicio=contract.data_inicio,
+        created_at=contract.created_at,
+    )
+
+
+async def _get_contract_or_404(
+    contract_id: str,
+    user_id: str,
+    session: AsyncSession,
+) -> Contract:
+    result = await session.execute(
+        select(Contract).where(
+            Contract.id == uuid.UUID(contract_id),
+            Contract.user_id == uuid.UUID(user_id),
+        )
+    )
+    contract = result.scalar_one_or_none()
+    if not contract:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contrato não encontrado")
+    return contract
+
+
+# ── Endpoints ─────────────────────────────────────────────────────────────────
+
+@router.get("", response_model=list[ContractResponse])
+async def list_contracts(
+    user_id: str = Depends(get_current_user_id),
+    session: AsyncSession = Depends(get_rls_session),
+) -> list[ContractResponse]:
+    result = await session.execute(
+        select(Contract)
+        .where(Contract.user_id == uuid.UUID(user_id))
+        .order_by(Contract.created_at.desc())
+    )
+    contracts = result.scalars().all()
+    return [_build_response(c) for c in contracts]
+
+
+@router.post("", response_model=ContractResponse, status_code=status.HTTP_201_CREATED)
+async def create_contract(
+    body: ContractCreate,
+    user_id: str = Depends(get_current_user_id),
+    session: AsyncSession = Depends(get_rls_session),
+) -> ContractResponse:
+    """
+    Cria imóvel + contrato num único request (fluxo do onboarding).
+    """
+    uid = uuid.UUID(user_id)
+
+    prop = Property(user_id=uid, apelido=body.property_apelido)
+    session.add(prop)
+    await session.flush()  # obtém prop.id antes de criar o contrato
+
+    contract = Contract(
+        user_id=uid,
+        property_id=prop.id,
+        apelido=body.apelido,
+        banco=body.banco,
+        sistema_amortizacao=body.sistema_amortizacao,
+        taxa_mensal=body.taxa_mensal,
+        saldo_devedor=body.saldo_devedor,
+        amortizacao_mensal=body.amortizacao_mensal,
+        mip_mensal=body.mip_mensal,
+        dfi_mensal=body.dfi_mensal,
+        data_proxima_parcela=body.data_proxima_parcela,
+        prazo_remanescente=body.prazo_remanescente,
+        valor_original=body.valor_original,
+        data_inicio=body.data_inicio,
+    )
+    session.add(contract)
+    await session.commit()
+    await session.refresh(contract)
+
+    return _build_response(contract)
+
+
+@router.get("/{contract_id}", response_model=ContractResponse)
+async def get_contract(
+    contract_id: str,
+    user_id: str = Depends(get_current_user_id),
+    session: AsyncSession = Depends(get_rls_session),
+) -> ContractResponse:
+    contract = await _get_contract_or_404(contract_id, user_id, session)
+    return _build_response(contract)
+
+
+@router.patch("/{contract_id}", response_model=ContractResponse)
+async def update_contract(
+    contract_id: str,
+    body: ContractUpdate,
+    user_id: str = Depends(get_current_user_id),
+    session: AsyncSession = Depends(get_rls_session),
+) -> ContractResponse:
+    contract = await _get_contract_or_404(contract_id, user_id, session)
+
+    for field, value in body.model_dump(exclude_none=True).items():
+        setattr(contract, field, value)
+
+    await session.commit()
+    await session.refresh(contract)
+    return _build_response(contract)
+
+
+@router.delete("/{contract_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_contract(
+    contract_id: str,
+    user_id: str = Depends(get_current_user_id),
+    session: AsyncSession = Depends(get_rls_session),
+) -> None:
+    contract = await _get_contract_or_404(contract_id, user_id, session)
+    await session.delete(contract)
+    await session.commit()
