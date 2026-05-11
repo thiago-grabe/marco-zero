@@ -14,13 +14,14 @@ export const Route = createFileRoute("/dashboard")({
 function Dashboard() {
   const navigate = useNavigate();
   const { authenticated, logout } = useAuth();
-  const { data: contracts, isLoading: loadingContracts } = useContracts();
+  const { data: contracts, isLoading: loadingContracts, isError: contractsError } = useContracts();
   const { data: contract, isLoading: loadingContract } = useActiveContract();
   const { activeContractId, setActiveContractId } = useContractStore();
 
+  // Redirecionar para login se não autenticado ou se query falhou com 401
   useEffect(() => {
-    if (!authenticated) navigate({ to: "/login" });
-  }, [authenticated, navigate]);
+    if (!authenticated || contractsError) navigate({ to: "/login" });
+  }, [authenticated, contractsError, navigate]);
 
   // Quando contratos carregam: se não tem ativo, usar o primeiro; se não tem nenhum, ir para onboarding
   useEffect(() => {
@@ -37,14 +38,15 @@ function Dashboard() {
   const { data: scenarios } = useQuery({
     queryKey: ["scenarios", activeContractId],
     queryFn: () => scenariosApi.list(activeContractId!),
-    enabled: !!activeContractId,
+    enabled: !!activeContractId && authenticated,
+    retry: false,
   });
 
-  if (loadingContracts || loadingContract) {
+  if (!authenticated || loadingContracts || loadingContract) {
     return <LoadingScreen />;
   }
 
-  if (!contract) return null;
+  if (!contract) return <LoadingScreen />;
 
   // Barra de progresso
   const dataInicio = contract.data_inicio

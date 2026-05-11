@@ -1,11 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { contractsApi, type ContractCreate } from "@/lib/api/client";
 import { useContractStore } from "@/stores/contract";
+import { isAuthenticated } from "@/lib/auth";
 
 export function useContracts() {
   return useQuery({
     queryKey: ["contracts"],
     queryFn: contractsApi.list,
+    enabled: isAuthenticated(),
+    retry: false,
   });
 }
 
@@ -13,7 +16,8 @@ export function useContract(id: string | null) {
   return useQuery({
     queryKey: ["contracts", id],
     queryFn: () => contractsApi.get(id!),
-    enabled: !!id,
+    enabled: !!id && isAuthenticated(),
+    retry: false,
   });
 }
 

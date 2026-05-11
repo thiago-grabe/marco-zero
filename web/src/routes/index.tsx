@@ -118,7 +118,7 @@ function Landing() {
       <nav className="flex items-center justify-between px-6 py-5 max-w-2xl mx-auto">
         <span className="font-serif text-base font-semibold tracking-tight">Marco Zero</span>
         <Link
-          to="/dashboard"
+          to="/login"
           className="text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           Entrar
@@ -143,7 +143,7 @@ function Landing() {
         </p>
 
         <Link
-          to="/dashboard"
+          to="/login"
           className="inline-flex items-center gap-2 bg-primary text-primary-foreground
                      px-8 py-3 rounded-md text-sm font-medium
                      hover:bg-primary/90 transition-colors"
@@ -227,7 +227,7 @@ function Landing() {
           Calcule em 90 segundos. Sem cadastro de cartão, sem compromisso.
         </p>
         <Link
-          to="/dashboard"
+          to="/login"
           className="inline-flex items-center gap-2 bg-primary text-primary-foreground
                      px-8 py-3 rounded-md text-sm font-medium
                      hover:bg-primary/90 transition-colors"

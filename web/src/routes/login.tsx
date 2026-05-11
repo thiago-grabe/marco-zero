@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { setAuth } from "@/lib/auth";
+import { useEffect, useState } from "react";
+import { isAuthenticated, setAuth } from "@/lib/auth";
 import { notifyAuthChange } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/login")({
@@ -17,6 +17,11 @@ function Login() {
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Se já está logado, ir direto pro dashboard
+  useEffect(() => {
+    if (isAuthenticated()) navigate({ to: "/dashboard" });
+  }, [navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
