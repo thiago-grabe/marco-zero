@@ -19,7 +19,7 @@ interface SliderParams {
 
 function Scenarios() {
   const navigate = useNavigate();
-  const { authenticated, loading } = useAuth();
+  const { authenticated } = useAuth();
   const { data: contract } = useActiveContract();
   const activeContractId = useContractStore((s) => s.activeContractId);
   const queryClient = useQueryClient();
@@ -34,8 +34,8 @@ function Scenarios() {
   const [liveProjection, setLiveProjection] = useState<ScenarioProjection | null>(null);
 
   useEffect(() => {
-    if (!loading && !authenticated) navigate({ to: "/login" });
-  }, [loading, authenticated, navigate]);
+    if (!authenticated) navigate({ to: "/login" });
+  }, [authenticated, navigate]);
 
   const { data: scenarios, isLoading } = useQuery({
     queryKey: ["scenarios", activeContractId],

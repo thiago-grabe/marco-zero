@@ -9,17 +9,13 @@ from .base import Base
 
 
 class UserProfile(Base):
-    """
-    Extensão da identidade do Supabase Auth.
-    Criada automaticamente no primeiro login via /auth/me.
-    O `id` é o mesmo UUID do auth.users do Supabase (extraído do JWT).
-    """
-
     __tablename__ = "user_profiles"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
+    email: Mapped[str | None] = mapped_column(String, nullable=True, unique=True, index=True)
+    password_hash: Mapped[str | None] = mapped_column(String, nullable=True)
     nome: Mapped[str | None] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

@@ -1,53 +1,40 @@
-import { createClient } from "@supabase/supabase-js";
+/**
+ * Auth local — sem Supabase, sem serviços externos.
+ * JWT armazenado no localStorage.
+ */
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? "";
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? "";
+const TOKEN_KEY = "mz-token";
+const USER_KEY = "mz-user";
 
-export const isDev = !supabaseUrl || !supabaseAnonKey;
+export interface AuthUser {
+  user_id: string;
+  email: string;
+}
 
-// Em dev sem Supabase configurado, criamos um client dummy que não faz chamadas reais
-export const supabase = createClient(
-  supabaseUrl || "https://placeholder.supabase.co",
-  supabaseAnonKey || "placeholder-anon-key"
-);
+export function getStoredToken(): string | null {
+  return localStorage.getItem(TOKEN_KEY);
+}
 
-// Chave usada para armazenar o token dev no localStorage
-const DEV_TOKEN_KEY = "mz-dev-token";
-// Token fake aceito pelo backend em modo dev
-const DEV_TOKEN = "dev.bypass.token";
+export function getStoredUser(): AuthUser | null {
+  const raw = localStorage.getItem(USER_KEY);
+  return raw ? JSON.parse(raw) : null;
+}
 
-/** Retorna o access token atual (Supabase real ou dev bypass). */
+export function setAuth(token: string, user: AuthUser): void {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
+export function clearAuth(): void {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+
+export function isAuthenticated(): boolean {
+  return !!localStorage.getItem(TOKEN_KEY);
+}
+
+/** Retorna o token para o API client. */
 export async function getToken(): Promise<string | null> {
-  if (isDev) {
-    return localStorage.getItem(DEV_TOKEN_KEY);
-  }
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  return session?.access_token ?? null;
-}
-
-/** Login dev: injeta um token fake que o backend aceita em modo dev. */
-export function devLogin(): void {
-  localStorage.setItem(DEV_TOKEN_KEY, DEV_TOKEN);
-}
-
-/** Logout — limpa sessão Supabase ou token dev. */
-export async function logout(): Promise<void> {
-  if (isDev) {
-    localStorage.removeItem(DEV_TOKEN_KEY);
-    return;
-  }
-  await supabase.auth.signOut();
-}
-
-/** Verifica se o usuário está logado. */
-export async function isAuthenticated(): Promise<boolean> {
-  if (isDev) {
-    return !!localStorage.getItem(DEV_TOKEN_KEY);
-  }
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  return !!session;
+  return getStoredToken();
 }

@@ -1,28 +1,30 @@
-import { useEffect, useState } from "react";
-import { isDev, isAuthenticated, supabase } from "@/lib/auth";
+import { useCallback, useSyncExternalStore } from "react";
+import { isAuthenticated, clearAuth, getStoredUser } from "@/lib/auth";
 
-export interface AuthState {
-  authenticated: boolean;
-  loading: boolean;
+// Reativo: qualquer componente que use useAuth re-renderiza quando o token muda
+const listeners = new Set<() => void>();
+function subscribe(cb: () => void) {
+  listeners.add(cb);
+  return () => listeners.delete(cb);
 }
 
-export function useAuth(): AuthState {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+function getSnapshot(): boolean {
+  return isAuthenticated();
+}
 
-  useEffect(() => {
-    isAuthenticated().then((auth) => {
-      setAuthenticated(auth);
-      setLoading(false);
-    });
+/** Notifica todos os subscribers que o estado de auth mudou. */
+export function notifyAuthChange(): void {
+  listeners.forEach((cb) => cb());
+}
 
-    if (!isDev) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-        setAuthenticated(!!session);
-      });
-      return () => subscription.unsubscribe();
-    }
+export function useAuth() {
+  const authenticated = useSyncExternalStore(subscribe, getSnapshot);
+  const user = getStoredUser();
+
+  const logout = useCallback(() => {
+    clearAuth();
+    notifyAuthChange();
   }, []);
 
-  return { authenticated, loading };
+  return { authenticated, user, logout };
 }

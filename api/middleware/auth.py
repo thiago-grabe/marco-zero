@@ -1,11 +1,11 @@
 """
-JWT validation para tokens emitidos pelo Supabase Auth.
-
-Supabase usa RS256. Para validar, precisamos da chave pública do projeto.
-No desenvolvimento, podemos usar HS256 com o JWT secret do projeto.
+JWT auth — autenticação local sem dependência de serviços externos.
+Tokens assinados com HS256 usando jwt_secret do config.
 """
 
 from __future__ import annotations
+
+from datetime import datetime, timedelta, timezone
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -15,30 +15,21 @@ from config import settings
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_HOURS = 72
+
+
+def create_access_token(user_id: str) -> str:
+    """Cria um JWT para o usuário."""
+    expire = datetime.now(timezone.utc) + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
+    payload = {"sub": user_id, "exp": expire}
+    return jwt.encode(payload, settings.jwt_secret, algorithm=ALGORITHM)
+
 
 async def get_current_user_id(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
 ) -> str:
-    """
-    Extrai e valida o JWT do header Authorization: Bearer <token>.
-    Retorna o user_id (claim 'sub') se válido.
-    """
-    _is_placeholder = settings.supabase_jwt_secret in ("", "your-supabase-jwt-secret-here")
-    if settings.is_dev and _is_placeholder:
-        # Dev sem JWT real: aceita qualquer token ou sem token.
-        # Retorna o user_id do token se presente, senão usa o dev default.
-        if credentials:
-            try:
-                # Tenta decodificar sem verificar assinatura (só lê o sub)
-                payload = jwt.decode(
-                    credentials.credentials, options={"verify_signature": False}
-                )
-                if user_id := payload.get("sub"):
-                    return user_id
-            except JWTError:
-                pass
-        return "00000000-0000-0000-0000-000000000001"
-
+    """Extrai e valida o JWT. Retorna o user_id."""
     if credentials is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -48,15 +39,14 @@ async def get_current_user_id(
     try:
         payload = jwt.decode(
             credentials.credentials,
-            settings.supabase_jwt_secret,
-            algorithms=["HS256"],
-            options={"verify_aud": False},
+            settings.jwt_secret,
+            algorithms=[ALGORITHM],
         )
         user_id: str = payload.get("sub")
         if not user_id:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token inválido: sem user_id",
+                detail="Token inválido",
             )
         return user_id
     except JWTError as e:

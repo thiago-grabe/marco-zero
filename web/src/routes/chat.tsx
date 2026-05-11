@@ -18,15 +18,15 @@ const SUGGESTIONS = [
 
 function ChatPage() {
   const navigate = useNavigate();
-  const { authenticated, loading } = useAuth();
+  const { authenticated } = useAuth();
   const { data: contract } = useActiveContract();
   const { messages, isStreaming, toolCalls, sendMessage, clearMessages } = useChat();
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!loading && !authenticated) navigate({ to: "/login" });
-  }, [loading, authenticated, navigate]);
+    if (!authenticated) navigate({ to: "/login" });
+  }, [authenticated, navigate]);
 
   // Auto-scroll ao receber novas mensagens
   useEffect(() => {

@@ -6,7 +6,6 @@ import { useActiveContract, useContracts } from "@/hooks/useContract";
 import { useContractStore } from "@/stores/contract";
 import { scenariosApi } from "@/lib/api/client";
 import { formatBRL, formatMonthYear } from "@/lib/utils";
-import { logout } from "@/lib/auth";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -14,15 +13,14 @@ export const Route = createFileRoute("/dashboard")({
 
 function Dashboard() {
   const navigate = useNavigate();
-  const { authenticated, loading } = useAuth();
+  const { authenticated, logout } = useAuth();
   const { data: contracts, isLoading: loadingContracts } = useContracts();
   const { data: contract, isLoading: loadingContract } = useActiveContract();
   const { activeContractId, setActiveContractId } = useContractStore();
 
-  // Redirecionar para login se não autenticado
   useEffect(() => {
-    if (!loading && !authenticated) navigate({ to: "/login" });
-  }, [loading, authenticated, navigate]);
+    if (!authenticated) navigate({ to: "/login" });
+  }, [authenticated, navigate]);
 
   // Quando contratos carregam: se não tem ativo, usar o primeiro; se não tem nenhum, ir para onboarding
   useEffect(() => {
@@ -42,7 +40,7 @@ function Dashboard() {
     enabled: !!activeContractId,
   });
 
-  if (loading || loadingContracts || loadingContract) {
+  if (loadingContracts || loadingContract) {
     return <LoadingScreen />;
   }
 
@@ -97,7 +95,7 @@ function Dashboard() {
             Cenários
           </Link>
           <button
-            onClick={async () => { await logout(); navigate({ to: "/login" }); }}
+            onClick={() => { logout(); navigate({ to: "/login" }); }}
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             Sair

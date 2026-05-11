@@ -1,23 +1,58 @@
-"""Testes do endpoint /auth/me."""
+"""Testes do auth local (registro + login + /me)."""
 
 import pytest
 
 
 @pytest.mark.asyncio
-async def test_me_cria_perfil_no_primeiro_login(client):
-    """Primeiro acesso deve criar o user_profile automaticamente."""
-    resp = await client.get("/auth/me")
-    assert resp.status_code == 200
+async def test_registro_retorna_201(client):
+    resp = await client.post("/auth/register", json={
+        "email": "newuser@marco-zero.dev",
+        "password": "senhasegura123",
+    })
+    assert resp.status_code == 201
     data = resp.json()
-    assert data["id"] == "00000000-0000-0000-0000-000000000001"
-    assert data["nome"] is None
+    assert "token" in data
+    assert data["email"] == "newuser@marco-zero.dev"
 
 
 @pytest.mark.asyncio
-async def test_me_idempotente(client):
-    """Chamar /me várias vezes não cria perfis duplicados."""
-    r1 = await client.get("/auth/me")
-    r2 = await client.get("/auth/me")
-    assert r1.status_code == 200
-    assert r2.status_code == 200
-    assert r1.json()["id"] == r2.json()["id"]
+async def test_registro_duplicado_retorna_409(client):
+    await client.post("/auth/register", json={
+        "email": "dup@marco-zero.dev", "password": "123456",
+    })
+    resp = await client.post("/auth/register", json={
+        "email": "dup@marco-zero.dev", "password": "654321",
+    })
+    assert resp.status_code == 409
+
+
+@pytest.mark.asyncio
+async def test_login_correto(client):
+    await client.post("/auth/register", json={
+        "email": "login@marco-zero.dev", "password": "minhasenha",
+    })
+    resp = await client.post("/auth/login", json={
+        "email": "login@marco-zero.dev", "password": "minhasenha",
+    })
+    assert resp.status_code == 200
+    assert "token" in resp.json()
+
+
+@pytest.mark.asyncio
+async def test_login_senha_errada_retorna_401(client):
+    await client.post("/auth/register", json={
+        "email": "wrong@marco-zero.dev", "password": "correta",
+    })
+    resp = await client.post("/auth/login", json={
+        "email": "wrong@marco-zero.dev", "password": "errada",
+    })
+    assert resp.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_me_com_token_valido(client):
+    """GET /auth/me deve retornar o perfil do usuário autenticado."""
+    resp = await client.get("/auth/me")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "id" in data

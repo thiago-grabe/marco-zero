@@ -1,147 +1,148 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { devLogin, isDev, supabase } from "@/lib/auth";
+import { setAuth } from "@/lib/auth";
+import { notifyAuthChange } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/login")({
   component: Login,
 });
 
+const BASE_URL = import.meta.env.VITE_API_URL ?? "/api";
+
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+  const [password, setPassword] = useState("");
+  const [nome, setNome] = useState("");
+  const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleMagicLink(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
-    });
+    const endpoint = isRegister ? "/auth/register" : "/auth/login";
+    const body = isRegister
+      ? { email, password, nome: nome || undefined }
+      : { email, password };
 
-    setLoading(false);
-    if (error) {
-      setError(error.message);
-    } else {
-      setSent(true);
+    try {
+      const res = await fetch(`${BASE_URL}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: "Erro" }));
+        setError(err.detail);
+        setLoading(false);
+        return;
+      }
+
+      const data = await res.json();
+      setAuth(data.token, { user_id: data.user_id, email: data.email });
+      notifyAuthChange();
+      navigate({ to: "/dashboard" });
+    } catch {
+      setError("Falha na conexão com o servidor");
+    } finally {
+      setLoading(false);
     }
-  }
-
-  function handleDevLogin() {
-    devLogin();
-    navigate({ to: "/dashboard" });
-  }
-
-  if (sent) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-6">
-        <div className="max-w-sm w-full text-center">
-          <p className="text-xs text-primary uppercase tracking-widest mb-6">
-            Marco Zero
-          </p>
-          <h1 className="font-serif text-2xl font-semibold mb-4">
-            Verifique seu e-mail
-          </h1>
-          <p className="text-muted-foreground text-sm leading-relaxed mb-8">
-            Enviamos um link de acesso para{" "}
-            <span className="text-foreground">{email}</span>.
-            <br />
-            Clique no link para entrar.
-          </p>
-          <button
-            onClick={() => setSent(false)}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Usar outro e-mail
-          </button>
-        </div>
-      </div>
-    );
   }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6">
       <div className="max-w-sm w-full">
-        {/* Header */}
         <div className="text-center mb-10">
-          <p className="text-xs text-primary uppercase tracking-widest mb-6">
-            Marco Zero
-          </p>
+          <p className="text-xs text-primary uppercase tracking-widest mb-6">Marco Zero</p>
           <h1 className="font-serif text-2xl font-semibold mb-2">
-            Entrar
+            {isRegister ? "Criar conta" : "Entrar"}
           </h1>
           <p className="text-muted-foreground text-sm">
-            Sem senha. Receba um link no seu e-mail.
+            {isRegister
+              ? "Crie sua conta para começar a usar."
+              : "Entre com seu e-mail e senha."}
           </p>
         </div>
 
-        {/* Form */}
-        {!isDev ? (
-          <form onSubmit={handleMagicLink} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {isRegister && (
             <div>
               <label className="text-xs text-muted-foreground uppercase tracking-wide block mb-2">
-                E-mail
+                Nome (opcional)
               </label>
               <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
+                type="text"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Seu nome"
                 className="w-full bg-muted border border-border rounded-md px-4 py-3
                            text-sm text-foreground placeholder:text-muted-foreground
                            focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
+          )}
 
-            {error && (
-              <p className="text-xs text-loss">{error}</p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-primary text-primary-foreground rounded-md py-3
-                         text-sm font-medium hover:bg-primary/90 transition-colors
-                         disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? "Enviando…" : "Receber link de acesso"}
-            </button>
-          </form>
-        ) : (
-          /* Dev mode: botão direto sem auth real */
-          <div className="space-y-4">
-            <div className="border border-dashed border-border rounded-md p-4 text-center">
-              <p className="text-xs text-muted-foreground mb-3">
-                Modo dev — Supabase não configurado
-              </p>
-              <button
-                onClick={handleDevLogin}
-                className="w-full bg-primary text-primary-foreground rounded-md py-3
-                           text-sm font-medium hover:bg-primary/90 transition-colors"
-              >
-                Entrar como dev
-              </button>
-            </div>
-            <p className="text-xs text-muted-foreground text-center">
-              Configure{" "}
-              <code className="text-foreground">VITE_SUPABASE_URL</code> e{" "}
-              <code className="text-foreground">VITE_SUPABASE_ANON_KEY</code> no{" "}
-              <code className="text-foreground">web/.env.local</code> para usar
-              magic link real.
-            </p>
+          <div>
+            <label className="text-xs text-muted-foreground uppercase tracking-wide block mb-2">
+              E-mail
+            </label>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="seu@email.com"
+              className="w-full bg-muted border border-border rounded-md px-4 py-3
+                         text-sm text-foreground placeholder:text-muted-foreground
+                         focus:outline-none focus:ring-1 focus:ring-primary"
+            />
           </div>
-        )}
+
+          <div>
+            <label className="text-xs text-muted-foreground uppercase tracking-wide block mb-2">
+              Senha
+            </label>
+            <input
+              type="password"
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Mínimo 6 caracteres"
+              className="w-full bg-muted border border-border rounded-md px-4 py-3
+                         text-sm text-foreground placeholder:text-muted-foreground
+                         focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+
+          {error && <p className="text-xs text-loss">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-primary text-primary-foreground rounded-md py-3
+                       text-sm font-medium hover:bg-primary/90 transition-colors
+                       disabled:opacity-50"
+          >
+            {loading ? "Aguarde…" : isRegister ? "Criar conta" : "Entrar"}
+          </button>
+        </form>
 
         <p className="text-center mt-6 text-xs text-muted-foreground">
-          Primeira vez?{" "}
-          <span className="text-foreground">
-            Conta criada automaticamente ao entrar.
-          </span>
+          {isRegister ? "Já tem conta?" : "Primeira vez?"}{" "}
+          <button
+            onClick={() => {
+              setIsRegister(!isRegister);
+              setError(null);
+            }}
+            className="text-foreground underline underline-offset-2"
+          >
+            {isRegister ? "Entrar" : "Criar conta"}
+          </button>
         </p>
       </div>
     </div>

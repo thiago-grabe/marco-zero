@@ -12,13 +12,14 @@ Banco: postgresql+asyncpg://73983@localhost:5432/marco_zero_test
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
 from main import app
 from middleware.auth import get_current_user_id
 from db.rls import get_rls_session
+from db.engine import get_session
 import db.models  # noqa — registra todos os models no Base.metadata
 
 # ── Config de teste ────────────────────────────────────────────────────────────
@@ -95,8 +96,32 @@ async def client():
             )
             yield session
 
+    async def override_plain_session() -> AsyncSession:
+        """Session sem RLS — usada por /auth/register e /auth/login."""
+        async with TestSession() as session:
+            yield session
+
     app.dependency_overrides[get_current_user_id] = override_user_id
     app.dependency_overrides[get_rls_session] = override_rls
+    app.dependency_overrides[get_session] = override_plain_session
+
+    # Criar o usuário de teste no banco (necessário para /auth/me e RLS)
+    async with TestSession() as seed_session:
+        await seed_session.execute(
+            text(f"SET \"app.current_user_id\" = '{TEST_USER_ID}'")
+        )
+        from db.models.user import UserProfile
+        import uuid as _uuid
+        existing = await seed_session.execute(
+            select(UserProfile).where(UserProfile.id == _uuid.UUID(TEST_USER_ID))
+        )
+        if not existing.scalar_one_or_none():
+            seed_session.add(UserProfile(
+                id=_uuid.UUID(TEST_USER_ID),
+                email="test@marco-zero.dev",
+                nome="Test User",
+            ))
+            await seed_session.commit()
 
     async with AsyncClient(
         transport=ASGITransport(app=app),
