@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useActiveContract } from "@/hooks/useContract";
 import { useChat } from "@/hooks/useChat";
+import { ChatMessageView } from "@/components/chat/ChatMessage";
+import { ChatInput } from "@/components/chat/ChatInput";
+import type { ChatAction } from "@/components/chat/types";
 
 export const Route = createFileRoute("/chat")({
   component: ChatPage,
@@ -17,21 +20,34 @@ const SUGGESTIONS = [
 
 function ChatPage() {
   const { data: contract } = useActiveContract();
-  const { messages, isStreaming, toolCalls, sendMessage, clearMessages } = useChat();
-  const [input, setInput] = useState("");
+  const { messages, isStreaming, context, sendMessage, clearMessages } = useChat();
+  const [prefill, setPrefill] = useState<string | undefined>();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll ao receber novas mensagens
+  // Auto-scroll on new messages
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, toolCalls]);
+  }, [messages]);
 
-  function handleSend(text?: string) {
-    const msg = text ?? input.trim();
-    if (!msg || !contract || isStreaming) return;
-    setInput("");
-    sendMessage(contract.id, msg);
+  function handleSend(text: string) {
+    if (!contract) return;
+    setPrefill(undefined);
+    sendMessage(contract.id, text);
   }
+
+  const handleAction = useCallback((action: ChatAction) => {
+    switch (action.type) {
+      case "prefill":
+        setPrefill(action.text);
+        break;
+      case "save_scenario":
+        // TODO: scenariosApi.create()
+        break;
+      case "expand":
+        // Handled locally in ToolResultCard
+        break;
+    }
+  }, []);
 
   if (!contract) return null;
 
@@ -44,7 +60,14 @@ function ChatPage() {
         <Link to="/dashboard" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
           ← Dashboard
         </Link>
-        <span className="font-serif text-sm font-semibold">Chat IA</span>
+        <div className="flex items-center gap-3">
+          <span className="font-serif text-sm font-semibold">Chat IA</span>
+          {context && (
+            <span className="text-xs text-muted-foreground">
+              {context.banco.toUpperCase()} · {context.prazo_remanescente} parcelas
+            </span>
+          )}
+        </div>
         <button
           onClick={clearMessages}
           className="text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -54,9 +77,9 @@ function ChatPage() {
       </nav>
 
       {/* Messages area */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6" role="log" aria-live="polite">
         <div className="max-w-2xl mx-auto space-y-6">
-          {/* Estado vazio */}
+          {/* Empty state */}
           {!hasMessages && (
             <div className="pt-12 pb-8">
               <p className="text-xs text-primary uppercase tracking-widest mb-4 text-center">
@@ -85,53 +108,19 @@ function ChatPage() {
             </div>
           )}
 
-          {/* Mensagens */}
+          {/* Messages */}
           {messages.map((msg, i) => (
-            <div key={i} className={msg.role === "user" ? "flex justify-end" : ""}>
-              <div
-                className={
-                  msg.role === "user"
-                    ? "bg-primary/10 border border-primary/20 rounded-lg px-4 py-3 max-w-[80%]"
-                    : "max-w-[95%]"
-                }
-              >
-                {msg.role === "assistant" ? (
-                  <div className="prose prose-invert prose-sm max-w-none text-foreground leading-relaxed whitespace-pre-wrap">
-                    {msg.content}
-                  </div>
-                ) : (
-                  <p className="text-sm text-foreground">{msg.content}</p>
-                )}
-              </div>
-            </div>
+            <ChatMessageView
+              key={i}
+              message={msg}
+              isStreaming={isStreaming}
+              isLastMessage={i === messages.length - 1}
+              onAction={handleAction}
+            />
           ))}
 
-          {/* Indicador de tool calls ativas */}
-          {isStreaming && toolCalls.length > 0 && (
-            <div className="space-y-1">
-              {toolCalls.map((tc, i) => (
-                <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <div className="w-3 h-3 border border-primary border-t-transparent rounded-full animate-spin" />
-                  <span>
-                    {tc.tool === "projetar_cenario"
-                      ? "Projetando cenário…"
-                      : tc.tool === "simular_amortizacao"
-                        ? "Simulando amortização…"
-                        : tc.tool === "comparar_cenarios"
-                          ? "Comparando cenários…"
-                          : tc.tool === "calcular_parcela"
-                            ? "Calculando parcela…"
-                            : tc.tool === "calcular_pro_rata"
-                              ? "Calculando pró-rata…"
-                              : `Executando ${tc.tool}…`}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Streaming sem tool calls = gerando texto */}
-          {isStreaming && toolCalls.length === 0 && messages[messages.length - 1]?.role === "user" && (
+          {/* Streaming indicator when no parts yet */}
+          {isStreaming && messages.length > 0 && messages[messages.length - 1].role === "user" && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <div className="w-3 h-3 border border-primary border-t-transparent rounded-full animate-spin" />
               <span>Pensando…</span>
@@ -141,33 +130,7 @@ function ChatPage() {
       </div>
 
       {/* Input */}
-      <div className="shrink-0 border-t border-border px-6 py-4">
-        <div className="max-w-2xl mx-auto flex gap-3">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-            placeholder="Pergunte sobre seu financiamento…"
-            disabled={isStreaming}
-            className="flex-1 bg-muted border border-border rounded-md px-4 py-3
-                       text-sm text-foreground placeholder:text-muted-foreground
-                       focus:outline-none focus:ring-1 focus:ring-primary
-                       disabled:opacity-50"
-          />
-          <button
-            onClick={() => handleSend()}
-            disabled={isStreaming || !input.trim()}
-            className="bg-primary text-primary-foreground px-5 py-3 rounded-md text-sm font-medium
-                       hover:bg-primary/90 transition-colors disabled:opacity-40"
-          >
-            Enviar
-          </button>
-        </div>
-        <p className="max-w-2xl mx-auto text-xs text-muted-foreground mt-2 text-center">
-          Números calculados pelo motor SAC — a IA não calcula por conta própria.
-        </p>
-      </div>
+      <ChatInput onSend={handleSend} isStreaming={isStreaming} prefill={prefill} />
     </div>
   );
 }
