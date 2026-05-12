@@ -50,7 +50,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <nav className="flex items-center justify-between px-6 py-4 border-b border-border">
-        <span className="font-serif text-sm font-semibold">Tenor</span>
+        <img src="/brand/logo-dark.svg" alt="Tenor" className="h-5" />
         {contracts && contracts.length > 1 && (
           <select
             value={activeContractId ?? ""}

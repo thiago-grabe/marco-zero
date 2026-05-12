@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 90" fill="none">
+  <text x="16" y="60" font-family="'IBM Plex Serif', Georgia, serif" font-size="56" font-weight="700" fill="#1A1A2E" letter-spacing="-1.5">tenor</text>
+  <line x1="16" y1="72" x2="300" y2="72" stroke="#1A1A2E" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="69" x2="40" y2="75" stroke="#1A1A2E" stroke-width="1.2" opacity="0.4"/>
+  <line x1="70" y1="69" x2="70" y2="75" stroke="#1A1A2E" stroke-width="1.2" opacity="0.4"/>
+  <line x1="110" y1="69" x2="110" y2="75" stroke="#1A1A2E" stroke-width="1.2" opacity="0.4"/>
+  <line x1="145" y1="68" x2="145" y2="76" stroke="#1A1A2E" stroke-width="1.5" opacity="0.6"/>
+  <line x1="180" y1="69" x2="180" y2="75" stroke="#1A1A2E" stroke-width="1.2" opacity="0.4"/>
+  <line x1="220" y1="69" x2="220" y2="75" stroke="#1A1A2E" stroke-width="1.2" opacity="0.4"/>
+  <line x1="260" y1="69" x2="260" y2="75" stroke="#1A1A2E" stroke-width="1.2" opacity="0.4"/>
+</svg>

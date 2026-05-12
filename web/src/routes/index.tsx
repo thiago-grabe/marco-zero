@@ -116,7 +116,7 @@ function Landing() {
     <div className="min-h-screen bg-background text-foreground">
       {/* ── Nav ────────────────────────────────────────────────────────────── */}
       <nav className="flex items-center justify-between px-6 py-5 max-w-2xl mx-auto">
-        <span className="font-serif text-base font-semibold tracking-tight">Tenor</span>
+        <img src="/brand/logo-dark.svg" alt="Tenor" className="h-6" />
         <Link
           to="/onboarding"
           className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -239,7 +239,7 @@ function Landing() {
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
       <footer className="border-t border-border px-6 py-8 max-w-2xl mx-auto">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span className="font-serif">Tenor</span>
+          <img src="/brand/logo-dark.svg" alt="Tenor" className="h-4" />
           <span>Conformidade LGPD · Dados no Brasil</span>
         </div>
       </footer>

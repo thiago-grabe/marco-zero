@@ -62,7 +62,7 @@ function Login() {
     <div className="min-h-screen bg-background flex items-center justify-center px-6">
       <div className="max-w-sm w-full">
         <div className="text-center mb-10">
-          <p className="text-xs text-primary uppercase tracking-widest mb-6">Tenor</p>
+          <img src="/brand/logo-dark.svg" alt="Tenor" className="h-6 mx-auto mb-6" />
           <h1 className="font-serif text-2xl font-semibold mb-2">
             {isRegister ? "Criar conta" : "Entrar"}
           </h1>

@@ -1,3 +1,18 @@
+<p align="center">
+  <img src="web/public/brand/logo-full.svg" alt="Tenor" width="280" />
+</p>
+
+<p align="center">
+  <strong>O cofre privado do seu financiamento imobiliário.</strong><br/>
+  Motor SAC/PRICE determinístico · Chat IA com ferramentas · Open source
+</p>
+
+<p align="center">
+  <img src="web/public/brand/icon.svg" alt="t" width="28" />
+</p>
+
+---
+
 # Tenor
 
 **Tenor é o cofre privado do seu financiamento imobiliário.** O nome vem de *tenor* — o termo técnico em banking para o prazo contratual de um empréstimo. Quando um analista diz "a 30-year tenor", está falando exatamente do horizonte que define a vida financeira do mutuário. É isso que o Tenor te ajuda a entender, encurtar e otimizar.

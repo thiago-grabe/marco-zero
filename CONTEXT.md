@@ -217,47 +217,7 @@ Tela completa e em destaque mostrando: identidade, contratos, cenários, consent
 
 ---
 
-## 8. Planos e pricing
-
-Plano Família descartado. Estrutura atual:
-
-| Feature | Básico (grátis) | Plus (R$ 19/mês) | Avançado (R$ 39/mês) |
-|---|---|---|---|
-| Contratos | 1 | 3 | Ilimitado |
-| Cenários | 2 | Ilimitado | Ilimitado |
-| IA Chat | 10 perguntas/mês | Ilimitado | Ilimitado |
-| Coach — alertas básicos | ✓ | ✓ | ✓ |
-| Coach — Selic/portabilidade | — | ✓ | ✓ |
-| Stress Tests | 1 simples | Predefinidos | Todos + custom |
-| Audit completo | Linha do tempo | + Reconciliação | + Logs IA + export |
-| Versionamento DDC | Última versão | Últimas 5 | Ilimitado |
-| Direitos LGPD | Idêntico | Idêntico | Idêntico |
-
-**Princípios anti-dark-pattern**:
-- Cancelamento = mesmo número de cliques que assinatura
-- Trial só com confirmação ativa (não auto-debit)
-- Sem confirm-shaming
-- Pro-rata sempre
-- Reajuste só na renovação anual, com aviso de 30 dias
-
----
-
-## 9. Plataforma
-
-| Camada | Pré-MVP | Produção |
-|---|---|---|
-| Hospedagem | Vercel | Fly.io GRU |
-| BD | Supabase Pro | Neon GRU + Lucia auth |
-| Storage PDFs | Cloudflare R2 | AWS S3 sa-east-1 + KMS |
-| Auth | Supabase | Auth.js + Postgres + MFA |
-| LLM | Anthropic ZDR | Anthropic ZDR |
-| Monitoramento | Sentry + UptimeRobot | + Axiom + Better Stack |
-
-**Regra de migração**: começar simples (Vercel + Supabase), mas com schema e separação de camadas que permitem migrar em uma sprint.
-
----
-
-## 10. Concorrência — espaço em branco
+## 8. Concorrência — espaço em branco
 
 Todos os simuladores existentes (Larya, Educando Seu Bolso, Calculadora Brasil, Bext, simuladores de banco):
 - ✗ Não conhecem seu contrato persistentemente
@@ -271,18 +231,9 @@ Tenor faz tudo isso.
 
 ---
 
-## 11. Status atual
+## 9. Status técnico
 
-### Concluído (ideação)
-- [x] Visão, posicionamento, naming, estética
-- [x] Hierarquia de dados e modelo mental do produto
-- [x] Estratégia de ingestão (parsers, LLM, manual)
-- [x] LGPD e segurança como produto (não compliance)
-- [x] Pricing sem dark patterns
-- [x] Wireframes das 7 jornadas principais
-- [x] Distribuição de features por plano
-
-### Próximas etapas (técnico)
+### Implementado
 - [x] Schema relacional concreto (tabelas, FKs, RLS policies) — `docs/technical/schema_01.md`
 - [x] Motor de cálculo (SAC/PRICE/Itaú, 17 Tools) — `docs/technical/motor_01.md`
 - [x] Agente de extração agnóstico (qualquer banco, qualquer PDF) — `docs/technical/parser_01.md`
