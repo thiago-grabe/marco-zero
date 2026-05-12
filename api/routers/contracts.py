@@ -38,7 +38,14 @@ def _build_response(contract: Contract) -> ContractResponse:
 
     juros_proxima = round(saldo * taxa, 2)
     seguros = round(mip + dfi, 2)
-    parcela_total = round(amort + juros_proxima + seguros, 2)
+
+    # Custos extras não mapeados
+    extras_raw = contract.custos_extras or []
+    from models.contract import CustoExtra
+    custos_extras = [CustoExtra(**e) if isinstance(e, dict) else e for e in extras_raw]
+    custos_extras_total = round(sum(e.valor if hasattr(e, 'valor') else e.get("valor", 0) for e in extras_raw), 2)
+
+    parcela_total = round(amort + juros_proxima + seguros + custos_extras_total, 2)
     taxa_anual = round((1 + taxa) ** 12 - 1, 6)
 
     # Projeção base para data de quitação
@@ -65,6 +72,8 @@ def _build_response(contract: Contract) -> ContractResponse:
         mip_mensal=mip,
         dfi_mensal=dfi,
         seguros_mensal=seguros,
+        custos_extras=custos_extras,
+        custos_extras_total=custos_extras_total,
         parcela_total=parcela_total,
         juros_proxima=juros_proxima,
         data_proxima_parcela=contract.data_proxima_parcela,
@@ -137,6 +146,7 @@ async def create_contract(
         dfi_mensal=body.dfi_mensal,
         data_proxima_parcela=body.data_proxima_parcela,
         prazo_remanescente=body.prazo_remanescente,
+        custos_extras=[e.model_dump() for e in body.custos_extras],
         valor_original=body.valor_original,
         data_inicio=body.data_inicio,
     )

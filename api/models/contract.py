@@ -5,6 +5,12 @@ from typing import Optional
 from pydantic import BaseModel, Field, model_validator
 
 
+class CustoExtra(BaseModel):
+    """Custo extra não mapeado — cadastrado pelo usuário."""
+    nome: str = Field(min_length=1, max_length=100)
+    valor: float = Field(gt=0)
+
+
 class PropertyCreate(BaseModel):
     apelido: str = "Meu Imóvel"
 
@@ -12,7 +18,7 @@ class PropertyCreate(BaseModel):
 class ContractCreate(BaseModel):
     """Payload do onboarding — cria imóvel + contrato num único request."""
 
-    property_apelido: str = Field(default="Meu Imóvel")
+    property_apelido: str = Field(default="Apartamento")
     apelido: Optional[str] = None
 
     banco: str = Field(min_length=1)
@@ -26,6 +32,8 @@ class ContractCreate(BaseModel):
     dfi_mensal: float = Field(ge=0, default=0)
     data_proxima_parcela: date
     prazo_remanescente: int = Field(gt=0, lt=600)
+
+    custos_extras: list[CustoExtra] = Field(default_factory=list)
 
     valor_original: Optional[float] = Field(default=None, gt=0)
     data_inicio: Optional[date] = None
@@ -45,6 +53,7 @@ class ContractUpdate(BaseModel):
     dfi_mensal: Optional[float] = Field(default=None, ge=0)
     data_proxima_parcela: Optional[date] = None
     prazo_remanescente: Optional[int] = Field(default=None, gt=0)
+    custos_extras: Optional[list[CustoExtra]] = None
 
 
 class ContractResponse(BaseModel):
@@ -61,6 +70,8 @@ class ContractResponse(BaseModel):
     mip_mensal: float
     dfi_mensal: float
     seguros_mensal: float
+    custos_extras: list[CustoExtra]
+    custos_extras_total: float
     parcela_total: float
     juros_proxima: float
 

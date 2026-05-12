@@ -16,17 +16,23 @@ const BANCOS = [
   { code: "outro", label: "Outro" },
 ];
 
+interface CustoExtraField {
+  nome: string;
+  valor: string;
+}
+
 interface Fields {
   property_apelido: string;
   banco: string;
   sistema_amortizacao: "SAC" | "PRICE";
-  taxa_mensal_pct: string;   // string para o input (ex: "0,9631393")
+  taxa_mensal_pct: string;
   saldo_devedor: string;
   amortizacao_mensal: string;
   mip_mensal: string;
   dfi_mensal: string;
   data_proxima_parcela: string;
   prazo_remanescente: string;
+  custos_extras: CustoExtraField[];
 }
 
 const EMPTY: Fields = {
@@ -40,6 +46,7 @@ const EMPTY: Fields = {
   dfi_mensal: "0",
   data_proxima_parcela: "",
   prazo_remanescente: "",
+  custos_extras: [],
 };
 
 function parseNumber(s: string): number {
@@ -78,13 +85,29 @@ function Onboarding() {
   const prazo = parseInt(fields.prazo_remanescente) || 0;
   const mip = parseNumber(fields.mip_mensal);
   const dfi = parseNumber(fields.dfi_mensal);
+  const extras_total = fields.custos_extras.reduce((s, e) => s + parseNumber(e.valor), 0);
   const juros_est = saldo * taxa;
-  const parcela_est = amort + juros_est + mip + dfi;
+  const parcela_est = amort + juros_est + mip + dfi + extras_total;
   const taxa_aa = taxa > 0 ? (1 + taxa) ** 12 - 1 : 0;
+
+  function addCustoExtra() {
+    setFields((f) => ({ ...f, custos_extras: [...f.custos_extras, { nome: "", valor: "" }] }));
+  }
+
+  function removeCustoExtra(index: number) {
+    setFields((f) => ({ ...f, custos_extras: f.custos_extras.filter((_, i) => i !== index) }));
+  }
+
+  function updateCustoExtra(index: number, key: "nome" | "valor", value: string) {
+    setFields((f) => ({
+      ...f,
+      custos_extras: f.custos_extras.map((e, i) => (i === index ? { ...e, [key]: value } : e)),
+    }));
+  }
 
   async function handleSubmit() {
     await createContract.mutateAsync({
-      property_apelido: fields.property_apelido || "Meu Imóvel",
+      property_apelido: fields.property_apelido || "Apartamento",
       banco: fields.banco,
       sistema_amortizacao: fields.sistema_amortizacao,
       taxa_mensal: taxa,
@@ -94,8 +117,11 @@ function Onboarding() {
       dfi_mensal: dfi,
       data_proxima_parcela: fields.data_proxima_parcela,
       prazo_remanescente: prazo,
+      custos_extras: fields.custos_extras
+        .filter((e) => e.nome.trim() && parseNumber(e.valor) > 0)
+        .map((e) => ({ nome: e.nome.trim(), valor: parseNumber(e.valor) })),
     });
-    setStep(3); // vai pro insight
+    setStep(3);
   }
 
   // ── Passo 0 — Banco + Sistema ──────────────────────────────────────────────
@@ -177,12 +203,12 @@ function Onboarding() {
         </p>
 
         <div className="space-y-5">
-          <Field label="Apelido do imóvel (opcional)" hint="Ex: Apartamento Contagem">
+          <Field label="Apelido do imóvel (opcional)" hint="Ex: Apartamento, Casa praia">
             <input
               type="text"
               value={fields.property_apelido}
               onChange={(e) => set("property_apelido", e.target.value)}
-              placeholder="Meu Imóvel"
+              placeholder="Apartamento"
               className={inputCls}
             />
           </Field>
@@ -288,6 +314,63 @@ function Onboarding() {
           </div>
         </div>
 
+        {/* Custos extras */}
+        <div className="mt-6 pt-5 border-t border-border">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                Custos extras mensais
+              </p>
+              <p className="text-xs text-muted-foreground/60 mt-0.5">
+                Taxas, condomínio, ou outros custos não mapeados acima
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={addCustoExtra}
+              className="text-xs text-primary hover:text-primary/80 transition-colors"
+            >
+              + Adicionar
+            </button>
+          </div>
+
+          {fields.custos_extras.map((extra, i) => (
+            <div key={i} className="flex gap-2 mb-2 items-start">
+              <input
+                type="text"
+                value={extra.nome}
+                onChange={(e) => updateCustoExtra(i, "nome", e.target.value)}
+                placeholder="Nome do custo"
+                className={inputCls + " flex-1"}
+              />
+              <div className="relative w-32">
+                <span className="absolute left-3 top-3 text-muted-foreground text-sm">R$</span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={extra.valor}
+                  onChange={(e) => updateCustoExtra(i, "valor", e.target.value)}
+                  placeholder="0"
+                  className={inputCls + " pl-9"}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => removeCustoExtra(i)}
+                className="text-xs text-muted-foreground hover:text-loss transition-colors pt-3 px-1"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+
+          {extras_total > 0 && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Total custos extras: <span className="text-foreground font-medium">{formatBRL(extras_total)}/mês</span>
+            </p>
+          )}
+        </div>
+
         <div className="flex gap-3 mt-8">
           <button
             onClick={() => setStep(0)}
@@ -329,6 +412,11 @@ function Onboarding() {
             ["Amortização mensal", formatBRL(amort)],
             ["Juros estimados", formatBRL(juros_est)],
             ["Seguros", formatBRL(mip + dfi)],
+            ...(extras_total > 0
+              ? fields.custos_extras
+                  .filter((e) => e.nome.trim() && parseNumber(e.valor) > 0)
+                  .map((e) => [`Extra: ${e.nome}`, formatBRL(parseNumber(e.valor))])
+              : []),
             ["Parcela total estimada", formatBRL(parcela_est)],
             ["Parcelas restantes", String(prazo)],
             ["Próximo vencimento", fields.data_proxima_parcela],

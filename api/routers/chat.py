@@ -83,8 +83,24 @@ async def chat(
         f"- Parcela total estimada: R$ {parcela:,.2f}\n"
         f"- Próximo vencimento: {contract.data_proxima_parcela}\n"
         f"- Parcelas restantes: {contract.prazo_remanescente}\n"
-        f"\nUse estes valores como parâmetros ao chamar as ferramentas."
     )
+
+    # Incluir custos extras no contexto se existirem
+    extras = contract.custos_extras or []
+    if extras:
+        extras_total = sum(e.get("valor", 0) if isinstance(e, dict) else 0 for e in extras)
+        contract_context += f"\n## Custos extras mensais (cadastrados pelo usuário)\n"
+        for e in extras:
+            nome = e.get("nome", "?") if isinstance(e, dict) else "?"
+            valor = e.get("valor", 0) if isinstance(e, dict) else 0
+            contract_context += f"- {nome}: R$ {valor:,.2f}\n"
+        contract_context += f"- **Total custos extras: R$ {extras_total:,.2f}/mês**\n"
+        contract_context += (
+            f"\nIMPORTANTE: considere esses custos extras em TODA análise e recomendação. "
+            f"Eles impactam o comprometimento mensal real do usuário.\n"
+        )
+
+    contract_context += f"\nUse estes valores como parâmetros ao chamar as ferramentas."
 
     agent = create_chat_agent()
 

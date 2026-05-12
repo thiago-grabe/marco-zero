@@ -101,6 +101,9 @@ function Dashboard() {
             <Row label="Amortização" value={formatBRL(contract.amortizacao_mensal)} />
             <Row label="Juros" value={formatBRL(contract.juros_proxima)} accent />
             <Row label="Seguros (MIP + DFI)" value={formatBRL(contract.seguros_mensal)} />
+            {contract.custos_extras.length > 0 && contract.custos_extras.map((e, i) => (
+              <Row key={i} label={e.nome} value={formatBRL(e.valor)} />
+            ))}
             <div className="border-t border-border pt-2 mt-2">
               <Row label="Total" value={formatBRL(contract.parcela_total)} bold />
             </div>

@@ -30,6 +30,11 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 
+export interface CustoExtra {
+  nome: string;
+  valor: number;
+}
+
 export interface ContractResponse {
   id: string;
   property_id: string;
@@ -43,6 +48,8 @@ export interface ContractResponse {
   mip_mensal: number;
   dfi_mensal: number;
   seguros_mensal: number;
+  custos_extras: CustoExtra[];
+  custos_extras_total: number;
   parcela_total: number;
   juros_proxima: number;
   data_proxima_parcela: string;
@@ -65,6 +72,7 @@ export interface ContractCreate {
   dfi_mensal?: number;
   data_proxima_parcela: string;
   prazo_remanescente: number;
+  custos_extras?: CustoExtra[];
   valor_original?: number;
 }
 

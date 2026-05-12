@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import Date, DateTime, Integer, Numeric, String, text
+from sqlalchemy import Date, DateTime, Integer, JSON, Numeric, String, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -49,6 +49,10 @@ class Contract(Base):
     dfi_mensal: Mapped[float] = mapped_column(Numeric(14, 2), nullable=False, server_default="0")
     data_proxima_parcela: Mapped[date] = mapped_column(Date, nullable=False)
     prazo_remanescente: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    # Custos extras não mapeados — JSON array de {nome: str, valor: float}
+    # Ex: [{"nome": "Taxa de administração", "valor": 50.00}]
+    custos_extras: Mapped[list | None] = mapped_column(JSON, nullable=True, server_default="[]")
 
     # Campos opcionais (contexto histórico)
     valor_original: Mapped[float | None] = mapped_column(Numeric(14, 2), nullable=True)
