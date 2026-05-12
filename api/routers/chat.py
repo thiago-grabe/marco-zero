@@ -106,24 +106,28 @@ async def chat(
 
         try:
             stream_result = Runner.run_streamed(agent, input=messages)
+            # Track whether we're inside a tool call to suppress argument deltas
+            in_tool_call = False
 
             async for event in stream_result.stream_events():
                 if isinstance(event, RunItemStreamEvent):
                     item = event.item
 
                     if isinstance(item, ToolCallItem):
+                        in_tool_call = True
                         yield _sse("tool_call", {
                             "tool": item.raw_item.name if hasattr(item.raw_item, 'name') else str(item.type),
                             "arguments": item.raw_item.arguments if hasattr(item.raw_item, 'arguments') else "",
                         })
 
                     elif isinstance(item, ToolCallOutputItem):
+                        in_tool_call = False
                         yield _sse("tool_result", {
                             "output": item.output if isinstance(item.output, str) else str(item.output),
                         })
 
                     elif isinstance(item, MessageOutputItem):
-                        # Texto completo do item
+                        in_tool_call = False
                         text = ""
                         if hasattr(item, "raw_item") and hasattr(item.raw_item, "content"):
                             for block in item.raw_item.content:
@@ -133,18 +137,14 @@ async def chat(
                             yield _sse("text", {"content": text})
 
                 elif isinstance(event, RawResponsesStreamEvent):
-                    # Chunks de texto para streaming progressivo.
-                    # IMPORTANTE: filtrar deltas de tool call arguments (JSON) —
-                    # só emitir deltas de texto real do assistente.
+                    # Only emit text deltas when NOT inside a tool call.
+                    # Tool call arguments arrive as deltas too — suppress them all.
+                    if in_tool_call:
+                        continue
                     data = event.data
                     if hasattr(data, "type") and data.type == "output_text_delta":
                         delta = getattr(data, "delta", "")
                         if delta:
-                            yield _sse("text_delta", {"delta": delta})
-                    elif hasattr(data, "delta") and isinstance(data.delta, str):
-                        # Fallback: só emitir se não parecer JSON de argumentos
-                        delta = data.delta
-                        if delta and not delta.startswith("{") and not delta.startswith('"'):
                             yield _sse("text_delta", {"delta": delta})
 
             yield _sse("done", {"status": "ok"})

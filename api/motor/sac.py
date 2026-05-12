@@ -233,6 +233,7 @@ def project_scenario(
     aporte_mensal_extra: float = 0.0,
     aporte_anual_extra: float = 0.0,
     mes_aporte_anual: int | None = None,
+    meses_aporte_extra: list[int] | None = None,
     data_inicio_aportes: date | None = None,
     fgts_eventos: list[dict] | None = None,
 ) -> dict:
@@ -243,6 +244,10 @@ def project_scenario(
     - Amortização regular = amortizacao_mensal (fixa, do último DDC)
     - Aportes extras reduzem o saldo diretamente
     - Após cada aporte, o prazo é recalculado (modo SAC com redução de prazo)
+
+    Args:
+        meses_aporte_extra: lista de meses (1-12) em que o aporte_mensal_extra é aplicado.
+            Se None ou vazio, aplica todo mês. Ex: [2,4,6,8,10,12] para meses pares.
 
     Returns:
         ScenarioProjection como dict
@@ -306,7 +311,15 @@ def project_scenario(
         # ── Aportes extras ───────────────────────────────────────────────────
         aportes_ativos = data_inicio_aportes is None or data_corrente >= data_inicio_aportes
 
-        if aportes_ativos and aporte_mensal_extra > 0:
+        # Aporte mensal extra: aplica todo mês OU somente nos meses listados
+        mes_atual_do_ano = data_corrente.month
+        aplicar_extra_mensal = (
+            aportes_ativos
+            and aporte_mensal_extra > 0
+            and (not meses_aporte_extra or mes_atual_do_ano in meses_aporte_extra)
+        )
+
+        if aplicar_extra_mensal:
             extra_m = min(aporte_mensal_extra, saldo_corrente)
             saldo_corrente -= extra_m
             total_amort_extra_mensal += extra_m
@@ -444,6 +457,7 @@ def generate_installment_schedule(
     aporte_mensal_extra: float = 0.0,
     aporte_anual_extra: float = 0.0,
     mes_aporte_anual: int | None = None,
+    meses_aporte_extra: list[int] | None = None,
 ) -> list[dict]:
     """
     Gera planilha completa parcela a parcela até a quitação.
@@ -471,7 +485,11 @@ def generate_installment_schedule(
 
         saldo_pos = round(saldo_corrente - amort_reg, 2)
 
-        if aporte_mensal_extra > 0:
+        aplicar_extra = (
+            aporte_mensal_extra > 0
+            and (not meses_aporte_extra or data_corrente.month in meses_aporte_extra)
+        )
+        if aplicar_extra:
             extra_m = round(min(aporte_mensal_extra, saldo_pos), 2)
             saldo_pos = round(saldo_pos - extra_m, 2)
 
