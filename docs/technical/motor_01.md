@@ -1,4 +1,4 @@
-# Marco Zero — Motor de Cálculo & JSON Canônico
+# Tenor — Motor de Cálculo & JSON Canônico
 
 > Documento de design — versão 1
 > Data: 06/05/2026

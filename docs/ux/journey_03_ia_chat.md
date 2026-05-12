@@ -1,4 +1,4 @@
-# Marco Zero — Jornada 3: IA Chat
+# Tenor — Jornada 3: IA Chat
 
 > **Objetivo**: dar ao usuário um analista financeiro disponível 24/7 que conhece o contrato dele em detalhe.
 > **Princípio guia**: a IA explica e compara, **nunca decide**. Toda recomendação termina com "a decisão é sua" e mostra a matemática.
@@ -29,7 +29,7 @@ A IA é o lugar onde o produto mais se aproxima da promessa de "copiloto". Mas �
 ┌──────────────────────────────────────────────────────────┐
 │  ←  Apartamento Contagem (Itaú)         [Histórico]      │
 │                                                          │
-│  IA — Marco Zero                                         │
+│  IA — Tenor                                         │
 │                                                          │
 │  ┌──────────────────────────────────────────────┐        │
 │  │                                              │        │
@@ -77,7 +77,7 @@ Quando o usuário pergunta, a resposta tem **estrutura fixa de 3 camadas**:
 │                                                          │
 │  ─────────────────────────────────────────────────       │
 │                                                          │
-│  IA — Marco Zero                                         │
+│  IA — Tenor                                         │
 │                                                          │
 │  ─── Resposta direta ───                                 │
 │                                                          │
@@ -205,7 +205,7 @@ Quando o usuário pergunta, a resposta tem **estrutura fixa de 3 camadas**:
 │                                                          │
 │  ─── Modelo usado ───                                    │
 │                                                          │
-│  Cálculos: motor determinístico Marco Zero (Python)      │
+│  Cálculos: motor determinístico Tenor (Python)      │
 │  Geração de texto: Claude (Anthropic) — Zero Data        │
 │    Retention                                             │
 │                                                          │
@@ -244,9 +244,9 @@ Quando o usuário faz pergunta fora do escopo:
 │                                                          │
 │  ─────────────────────────────────────────────────       │
 │                                                          │
-│  IA — Marco Zero                                         │
+│  IA — Tenor                                         │
 │                                                          │
-│  Não recomendo ações específicas. Marco Zero foca        │
+│  Não recomendo ações específicas. Tenor foca        │
 │  em decisões sobre seu financiamento imobiliário.        │
 │                                                          │
 │  Posso te ajudar com:                                    │
@@ -269,7 +269,7 @@ A Selic vai cair pra 10% até o fim do ano?
 
 ─────────────────────────────────────────────────
 
-IA — Marco Zero
+IA — Tenor
 
 Não posso prever Selic futura. Posso te mostrar
 o que o mercado projeta hoje (Boletim Focus do
@@ -296,7 +296,7 @@ Posso parar de pagar a parcela?
 
 ─────────────────────────────────────────────────
 
-IA — Marco Zero
+IA — Tenor
 
 Não posso dar conselho jurídico. Inadimplência
 em financiamento imobiliário tem consequências
@@ -379,7 +379,7 @@ comportaria em diferentes cenários de renda
 Você
 Vale a pena?
 
-IA — Marco Zero
+IA — Tenor
 
 Vale a pena... o quê especificamente?
 
@@ -396,7 +396,7 @@ Posso te ajudar com algumas perguntas comuns:
 Você
 Compare amortizar com investir em renda fixa.
 
-IA — Marco Zero
+IA — Tenor
 
 Pra comparar com precisão, preciso saber:
 
@@ -418,9 +418,9 @@ Pra comparar com precisão, preciso saber:
 Você
 Considerando minha renda, posso amortizar R$ 10k/mês?
 
-IA — Marco Zero
+IA — Tenor
 
-Você ainda não declarou sua renda no Marco Zero.
+Você ainda não declarou sua renda no Tenor.
 Esse dado é opcional — usado só pra avaliações
 de comprometimento.
 
@@ -439,7 +439,7 @@ Usuário pode desativar IA na config:
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  IA — Marco Zero                                         │
+│  IA — Tenor                                         │
 │                                                          │
 │  ⓘ Você desativou análise por IA.                        │
 │                                                          │

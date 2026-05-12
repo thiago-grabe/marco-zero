@@ -1,4 +1,4 @@
-# Marco Zero — Jornada 1: Onboarding
+# Tenor — Jornada 1: Onboarding
 
 > **Objetivo**: do landing ao primeiro insight em < 90 segundos.
 > **Princípio guia**: o usuário sai do onboarding sentindo que o produto **já entendeu o contrato dele**, não que ele precisa ensinar o produto.
@@ -23,7 +23,7 @@ Cada tela é uma micro-transação de confiança. O usuário dá um pouco de inf
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  Marco Zero                              [Entrar →]      │
+│  Tenor                              [Entrar →]      │
 ├──────────────────────────────────────────────────────────┤
 │                                                          │
 │              Financiamento imobiliário                   │  ← label âmbar, caps
@@ -31,7 +31,7 @@ Cada tela é uma micro-transação de confiança. O usuário dá um pouco de inf
 │         Cada parcela tem um plano.                       │  ← serifa grande
 │         Cada plano tem um fim.                           │  ← muted
 │                                                          │
-│    Marco Zero é o cofre privado do seu                   │
+│    Tenor é o cofre privado do seu                   │
 │    financiamento. Você guarda seu contrato,              │
 │    simula cenários e sabe quando quita.                  │
 │                                                          │
@@ -48,7 +48,7 @@ Cada tela é uma micro-transação de confiança. O usuário dá um pouco de inf
 │  01  Você guarda seu contrato                            │
 │      Suba o PDF do DDC ou preencha manualmente.          │
 │                                                          │
-│  02  Marco Zero entende a matemática                     │
+│  02  Tenor entende a matemática                     │
 │      Motor SAC/PRICE calcula cenários em tempo real.     │
 │                                                          │
 │  03  Você age no momento certo                           │
@@ -81,7 +81,7 @@ Cada tela é uma micro-transação de confiança. O usuário dá um pouco de inf
 │         [ Ver meu plano de quitação ]                    │
 │                                                          │
 │  ────────────────────────────────────────────────────    │
-│  Marco Zero          Conformidade LGPD · Dados no Brasil │
+│  Tenor          Conformidade LGPD · Dados no Brasil │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -479,7 +479,7 @@ E o dashboard recebe o usuário com estado vazio (não vazio-vazio — vazio-aco
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  Marco Zero                          [perfil] [⚙]        │
+│  Tenor                          [perfil] [⚙]        │
 ├──────────────────────────────────────────────────────────┤
 │                                                          │
 │        Seu cofre está pronto.                            │
@@ -528,7 +528,7 @@ E o dashboard recebe o usuário com estado vazio (não vazio-vazio — vazio-aco
 
 ### Usuário abandona no meio (volta depois)
 
-Marco Zero salva o progresso na tela 0.4 em diante. Voltar abre direto na última tela alcançada, com mensagem leve no topo:
+Tenor salva o progresso na tela 0.4 em diante. Voltar abre direto na última tela alcançada, com mensagem leve no topo:
 
 ```
 ⓘ Você estava cadastrando seu Itaú. Vamos continuar?

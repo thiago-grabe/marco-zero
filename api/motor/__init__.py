@@ -1,5 +1,5 @@
 """
-Motor de cálculo Marco Zero — SAC / PRICE / Itaú
+Motor de cálculo Tenor — SAC / PRICE / Itaú
 
 Funções puras, sem I/O, sem side effects.
 Testáveis unitariamente com pytest.

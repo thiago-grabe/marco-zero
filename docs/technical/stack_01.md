@@ -1,4 +1,4 @@
-# Marco Zero — Decisões de Stack
+# Tenor — Decisões de Stack
 
 > Documento de design — versão 2
 > Data: 06/05/2026
@@ -56,7 +56,7 @@ As decisões têm dependências entre si — a ordem abaixo reflete essa preced�
 
 **Recomendação:** Web first com PWA progressivo.
 
-Marco Zero não tem features que exigem APIs nativas (câmera, sensores, notificações push podem ser web push). O ganho de PWA sobre web é a instalabilidade — o usuário adiciona à tela inicial e abre como app. Para um produto financeiro com uso de baixa frequência (poucos acessos por mês, mas cada acesso é importante), isso é suficiente.
+Tenor não tem features que exigem APIs nativas (câmera, sensores, notificações push podem ser web push). O ganho de PWA sobre web é a instalabilidade — o usuário adiciona à tela inicial e abre como app. Para um produto financeiro com uso de baixa frequência (poucos acessos por mês, mas cada acesso é importante), isso é suficiente.
 
 React Native adiciona complexidade de manutenção antes de validar product-market fit. Quando o produto tiver 10k+ usuários ativos e houver evidência de que a experiência nativa importa, vale migrar o mobile para RN/Expo mantendo o web.
 
@@ -264,7 +264,7 @@ result = await Runner.run(chat_agent, messages, context={"user_id": user_id})
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Agentes Marco Zero                    │
+│                    Agentes Tenor                    │
 │                                                         │
 │  ChatAgent               ExtractionAgent                │
 │  ──────────              ─────────────────              │

@@ -1,12 +1,12 @@
 """
-Fixtures de teste para Marco Zero API.
+Fixtures de teste para Tenor API.
 
 Estratégia de isolamento:
   - NullPool: cada teste usa uma conexão fresh, sem estado de pool.
   - Truncate autouse: tabelas limpas após cada teste.
   - Dependency override: auth e sessão de DB injetados nos testes.
 
-Banco: postgresql+asyncpg://73983@localhost:5432/marco_zero_test
+Banco: postgresql+asyncpg://73983@localhost:5432/tenor_test
 """
 
 import pytest
@@ -24,7 +24,7 @@ import db.models  # noqa — registra todos os models no Base.metadata
 
 # ── Config de teste ────────────────────────────────────────────────────────────
 
-TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5490/marco_zero_test"
+TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5490/tenor_test"
 TEST_USER_ID = "00000000-0000-0000-0000-000000000001"
 
 # NullPool: conexão fresh por operação, zero estado entre testes
@@ -118,7 +118,7 @@ async def client():
         if not existing.scalar_one_or_none():
             seed_session.add(UserProfile(
                 id=_uuid.UUID(TEST_USER_ID),
-                email="test@marco-zero.dev",
+                email="test@tenor.dev",
                 nome="Test User",
             ))
             await seed_session.commit()

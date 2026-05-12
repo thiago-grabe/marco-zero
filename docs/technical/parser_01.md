@@ -1,4 +1,4 @@
-# Marco Zero — Agente de Extração de DDC
+# Tenor — Agente de Extração de DDC
 
 > Documento de design — versão 1
 > Data: 06/05/2026

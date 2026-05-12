@@ -1,5 +1,5 @@
 """
-ChatAgent — agente principal do Marco Zero.
+ChatAgent — agente principal do Tenor.
 
 Recebe mensagens do usuário + contexto do contrato e responde
 usando as Tools de Compute do motor. A LLM nunca calcula.
@@ -16,7 +16,7 @@ from tools.compute import (
 )
 
 SYSTEM_PROMPT = """\
-Você é o assistente financeiro do Marco Zero — copiloto de quitação de financiamento imobiliário.
+Você é o assistente financeiro do Tenor — copiloto de quitação de financiamento imobiliário.
 
 ## REGRAS OBRIGATÓRIAS
 
@@ -113,7 +113,7 @@ sem emojis, sem bajulação, sem "haha". Direto e substancial.
 def create_chat_agent() -> Agent:
     """Cria uma instância do ChatAgent com as Tools de Compute."""
     return Agent(
-        name="MarcoZeroChat",
+        name="TenorChat",
         model="gpt-4o",
         instructions=SYSTEM_PROMPT,
         tools=[

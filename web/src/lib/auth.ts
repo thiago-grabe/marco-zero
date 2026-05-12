@@ -51,7 +51,7 @@ export async function ensureAuth(): Promise<void> {
   if (isAuthenticated()) return;
 
   const anonId = crypto.randomUUID().slice(0, 8);
-  const email = `anon-${anonId}@marco-zero.local`;
+  const email = `anon-${anonId}@tenor.local`;
   const password = crypto.randomUUID();
 
   try {

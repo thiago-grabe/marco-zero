@@ -1,9 +1,8 @@
 services:
-  # ── Postgres ─────────────────────────────────────────────────────────────────
   postgres:
     image: postgres:17-alpine
     environment:
-      POSTGRES_DB: marco_zero
+      POSTGRES_DB: tenor
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -16,14 +15,13 @@ services:
       timeout: 5s
       retries: 10
 
-  # ── API (FastAPI + motor + agentes) ──────────────────────────────────────────
   api:
     build: ./api
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/marco_zero
-      JWT_SECRET: ${JWT_SECRET:-marco-zero-change-me-in-production}
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/tenor
+      JWT_SECRET: ${JWT_SECRET:-tenor-change-me-in-production}
       OPENAI_API_KEY: ${OPENAI_API_KEY:?Defina OPENAI_API_KEY no .env}
       ENVIRONMENT: production
       CORS_ORIGINS: '["http://localhost:3000"]'
@@ -32,18 +30,16 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  # ── Migrations (roda uma vez e sai) ──────────────────────────────────────────
   migrations:
     build: ./api
     command: uv run alembic upgrade head
     environment:
-      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/marco_zero
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/tenor
     depends_on:
       postgres:
         condition: service_healthy
     restart: "no"
 
-  # ── Web (React build estático via nginx) ─────────────────────────────────────
   web:
     build: ./web
     ports:

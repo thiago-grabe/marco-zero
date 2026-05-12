@@ -6,22 +6,22 @@ import pytest
 @pytest.mark.asyncio
 async def test_registro_retorna_201(client):
     resp = await client.post("/auth/register", json={
-        "email": "newuser@marco-zero.dev",
+        "email": "newuser@tenor.dev",
         "password": "senhasegura123",
     })
     assert resp.status_code == 201
     data = resp.json()
     assert "token" in data
-    assert data["email"] == "newuser@marco-zero.dev"
+    assert data["email"] == "newuser@tenor.dev"
 
 
 @pytest.mark.asyncio
 async def test_registro_duplicado_retorna_409(client):
     await client.post("/auth/register", json={
-        "email": "dup@marco-zero.dev", "password": "123456",
+        "email": "dup@tenor.dev", "password": "123456",
     })
     resp = await client.post("/auth/register", json={
-        "email": "dup@marco-zero.dev", "password": "654321",
+        "email": "dup@tenor.dev", "password": "654321",
     })
     assert resp.status_code == 409
 
@@ -29,10 +29,10 @@ async def test_registro_duplicado_retorna_409(client):
 @pytest.mark.asyncio
 async def test_login_correto(client):
     await client.post("/auth/register", json={
-        "email": "login@marco-zero.dev", "password": "minhasenha",
+        "email": "login@tenor.dev", "password": "minhasenha",
     })
     resp = await client.post("/auth/login", json={
-        "email": "login@marco-zero.dev", "password": "minhasenha",
+        "email": "login@tenor.dev", "password": "minhasenha",
     })
     assert resp.status_code == 200
     assert "token" in resp.json()
@@ -41,10 +41,10 @@ async def test_login_correto(client):
 @pytest.mark.asyncio
 async def test_login_senha_errada_retorna_401(client):
     await client.post("/auth/register", json={
-        "email": "wrong@marco-zero.dev", "password": "correta",
+        "email": "wrong@tenor.dev", "password": "correta",
     })
     resp = await client.post("/auth/login", json={
-        "email": "wrong@marco-zero.dev", "password": "errada",
+        "email": "wrong@tenor.dev", "password": "errada",
     })
     assert resp.status_code == 401
 

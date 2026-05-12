@@ -191,7 +191,7 @@ function ProjectionCard({ data, raw, onAction }: { data: ScenarioProjectionResul
       y.ano, y.parcela_inicio, y.parcela_fim, y.saldo_inicio, y.saldo_fim,
       y.amort_regular, y.amort_extra_mensal, y.amort_extra_anual, y.fgts_aplicado, y.juros_pagos,
     ]);
-    downloadCSV(`marco-zero-projecao-${data.data_quitacao}.csv`, headers, rows);
+    downloadCSV(`tenor-projecao-${data.data_quitacao}.csv`, headers, rows);
   }
 
   return (

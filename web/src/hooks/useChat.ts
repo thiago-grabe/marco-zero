@@ -1,5 +1,5 @@
 /**
- * useChat — SSE streaming hook for Marco Zero chat.
+ * useChat — SSE streaming hook for Tenor chat.
  *
  * Handles all 6 SSE event types from the backend:
  *   context, tool_call, tool_result, text, text_delta, done, error

@@ -1,4 +1,4 @@
-# Marco Zero — MVP
+# Tenor — MVP
 
 > Documento de escopo — versão 1
 > Data: 10/05/2026

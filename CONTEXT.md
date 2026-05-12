@@ -1,4 +1,6 @@
-# Marco Zero — Master Context
+# Tenor — Master Context
+
+> Formerly "Marco Zero". Renamed to Tenor — the banking term for the contractual term of a loan.
 
 > Status: ideação completa, pronto para iniciar desenvolvimento
 > Última atualização: 06/05/2026
@@ -8,7 +10,7 @@
 
 ## 1. Origem do projeto
 
-Marco Zero nasceu de uma série de conversas sobre o financiamento imobiliário do Thiago (usuário-referência, fundador). Em 6 trocas, ele passou por:
+Tenor nasceu de uma série de conversas sobre o financiamento imobiliário do Thiago (usuário-referência, fundador). Em 6 trocas, ele passou por:
 
 | Momento | Insight |
 |---|---|
@@ -62,7 +64,7 @@ Marco Zero nasceu de uma série de conversas sobre o financiamento imobiliário 
 ## 3. Visão do produto
 
 ### Posicionamento
-> "Marco Zero é o copiloto de quitação imobiliária para o brasileiro que pensa em décadas."
+> "Tenor é o copiloto de quitação imobiliária para o brasileiro que pensa em décadas."
 
 Diferença de simulador para copiloto:
 - **Simulador**: você preenche números, vê tabela, fecha a aba.
@@ -70,12 +72,12 @@ Diferença de simulador para copiloto:
 
 **Tagline**: "Cada parcela tem um plano. Cada plano tem um fim."
 
-**Metáfora central**: "Marco Zero é o seu cofre de financiamentos."
+**Metáfora central**: "Tenor é o seu cofre de financiamentos."
 - Nunca "upload" → sempre "guardar"
 - Nunca "processar" → sempre "analisar seu contrato"
 
 ### Naming
-Marco Zero — o ponto de quitação. Brasileiro, memorável. Venceu sobre "Soleira" e "Esquadro".
+Tenor — o ponto de quitação. Brasileiro, memorável. Venceu sobre "Soleira" e "Esquadro".
 
 ### Estética
 **Dark premium** — inspirado em Cumbuca, Linear, Vercel dashboard. Técnico, moderno, premium.
@@ -265,7 +267,7 @@ Todos os simuladores existentes (Larya, Educando Seu Bolso, Calculadora Brasil, 
 - ✗ Não pensam em eventos de vida
 - ✗ Não têm reconciliação automática banco vs. esperado
 
-Marco Zero faz tudo isso.
+Tenor faz tudo isso.
 
 ---
 

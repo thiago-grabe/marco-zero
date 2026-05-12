@@ -1,7 +1,7 @@
-# Marco Zero — Jornada 7: Audit
+# Tenor — Jornada 7: Audit
 
 > **Objetivo**: provar que a matemática bate, e dar ao usuário transparência total sobre o que aconteceu.
-> **Princípio guia**: audit é a feature **menos sexy e mais defensável** do produto. É o que separa Marco Zero de qualquer simulador.
+> **Princípio guia**: audit é a feature **menos sexy e mais defensável** do produto. É o que separa Tenor de qualquer simulador.
 
 ---
 
@@ -17,7 +17,7 @@ Audit é a feature que a maioria dos usuários **nunca abre**. Mas saber que ela
 
 1. **Tudo é registrado.** Cada DDC importado, cada amortização declarada, cada cenário criado, cada interação com IA, cada acesso à conta.
 2. **Nada é apagado por padrão.** Histórico é imutável dentro do prazo de retenção. Edição preserva versão anterior.
-3. **Reconciliação automática.** Marco Zero compara o que esperava com o que o banco registra. Diferenças são sinalizadas, não escondidas.
+3. **Reconciliação automática.** Tenor compara o que esperava com o que o banco registra. Diferenças são sinalizadas, não escondidas.
 4. **Tudo exportável.** Linha do tempo, reconciliação, logs — em PDF e CSV.
 5. **Zero adornos.** Tom técnico-frio. Audit não tenta ser bonito — tenta ser inquestionável.
 
@@ -104,13 +104,13 @@ Audit é a feature que a maioria dos usuários **nunca abre**. Mas saber que ela
 
 ## Tela 7.2 — Reconciliação
 
-A feature **única** de Marco Zero. Compara o esperado com o real e mostra a matemática.
+A feature **única** de Tenor. Compara o esperado com o real e mostra a matemática.
 
 ```
 ┌──────────────────────────────────────────────────────────┐
 │  ←  Reconciliação                                        │
 │                                                          │
-│  Comparando o que o Marco Zero calcula com o que         │
+│  Comparando o que o Tenor calcula com o que         │
 │  o banco declara.                                        │
 │                                                          │
 │  Última verificação: 05/05/2026                          │
@@ -118,13 +118,13 @@ A feature **única** de Marco Zero. Compara o esperado com o real e mostra a mat
 │                                                          │
 │  ─── Saldo atual ───────────────────────────────         │
 │                                                          │
-│  Saldo esperado (Marco Zero)    R$ 429.629,87            │
+│  Saldo esperado (Tenor)    R$ 429.629,87            │
 │  Saldo declarado (DDC Itaú)     R$ 429.629,87            │
 │  Diferença                      R$ 0,00 ✓                │
 │                                                          │
 │  ─── Memória de cálculo ───────────────────────          │
 │                                                          │
-│  Como Marco Zero chegou em R$ 429.629,87:                │
+│  Como Tenor chegou em R$ 429.629,87:                │
 │                                                          │
 │  Saldo após parcela #4 (DDC 26/04)    R$ 510.977,65     │
 │  + Juros pró-rata 21/04 a 28/04        R$    178,73     │
@@ -161,14 +161,14 @@ A feature **única** de Marco Zero. Compara o esperado com o real e mostra a mat
 │                                                          │
 │  ─── Saldo atual ───────────────────────────────         │
 │                                                          │
-│  Saldo esperado (Marco Zero)    R$ 425.617,42            │
+│  Saldo esperado (Tenor)    R$ 425.617,42            │
 │  Saldo declarado (DDC Itaú)     R$ 426.851,98            │
 │  Diferença                      R$ 1.234,56              │
 │                                                          │
 │  ─── Possíveis causas ─────────────────────────          │
 │                                                          │
 │  1. TR aplicada diferente do esperado                    │
-│     • Marco Zero usa TR projetada                        │
+│     • Tenor usa TR projetada                        │
 │     • Banco usa TR efetiva publicada                     │
 │     • Variações típicas: ±0,1% a 0,3% por mês            │
 │     • Para saldo de R$ 426k, isso pode dar de            │
@@ -176,7 +176,7 @@ A feature **única** de Marco Zero. Compara o esperado com o real e mostra a mat
 │                                                          │
 │  2. Operação não registrada                              │
 │     • Você fez alguma amortização que não declarou       │
-│       no Marco Zero?                                     │
+│       no Tenor?                                     │
 │                                                          │
 │  3. Erro do banco (raro)                                 │
 │     • Parcela cobrada errada, valor de juros             │
@@ -338,7 +338,7 @@ A feature **única** de Marco Zero. Compara o esperado com o real e mostra a mat
 ┌──────────────────────────────────────────────────────────┐
 │  ⚠  Acesso suspeito reportado                            │
 │                                                          │
-│  Marco Zero vai:                                         │
+│  Tenor vai:                                         │
 │  ✓ Encerrar todas as sessões ativas                      │
 │  ✓ Bloquear novo login por 24 horas                      │
 │  ✓ Forçar você a redefinir senha (e MFA se ativo)        │
@@ -454,7 +454,7 @@ Quando o usuário aciona "Gerar carta para o banco" na reconciliação:
 ┌──────────────────────────────────────────────────────────┐
 │  ←  Carta para o banco                                   │
 │                                                          │
-│  Marco Zero pode gerar um documento explicando a         │
+│  Tenor pode gerar um documento explicando a         │
 │  divergência detectada. Ele serve como ponto de          │
 │  partida para discutir com o banco — você revisa,        │
 │  ajusta, e envia (não geramos correspondência            │
@@ -503,7 +503,7 @@ Quando o usuário aciona "Gerar carta para o banco" na reconciliação:
 
 ### Decisões
 
-- **Marco Zero gera ponto de partida**, não envia automaticamente.
+- **Tenor gera ponto de partida**, não envia automaticamente.
 - **Texto é editável.** Usuário ajusta antes de mandar.
 - **Cita resolução do BC.** Direito do consumidor reforçado.
 
@@ -613,4 +613,4 @@ Esta jornada é a mais **alinhada estruturalmente com LGPD**. Ela materializa di
 - **Retenção de logs por plano**, mas direitos LGPD são iguais para todos.
 - **Apagar conversas de IA** é botão único, sem fricção.
 - **Desativar IA** é toggle simples — não envia mais dados externamente.
-- **Carta para o banco** não é enviada por Marco Zero — usuário tem controle total.
+- **Carta para o banco** não é enviada por Tenor — usuário tem controle total.

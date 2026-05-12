@@ -1,5 +1,5 @@
 /**
- * API client tipado para o backend Marco Zero.
+ * API client tipado para o backend Tenor.
  * Token injetado automaticamente via Supabase (prod) ou dev bypass.
  */
 

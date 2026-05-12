@@ -48,11 +48,11 @@ const howItWorks = [
   {
     n: "01",
     title: "Você guarda seu contrato",
-    body: "Suba o PDF do DDC ou preencha manualmente. Marco Zero extrai saldo, taxa e parcelas.",
+    body: "Suba o PDF do DDC ou preencha manualmente. Tenor extrai saldo, taxa e parcelas.",
   },
   {
     n: "02",
-    title: "Marco Zero entende a matemática",
+    title: "Tenor entende a matemática",
     body: "Motor SAC/PRICE calcula cenários em tempo real. Veja quando quita com cada estratégia de amortização.",
   },
   {
@@ -82,10 +82,10 @@ function TimelineVisual() {
         <span className="text-xs text-primary mt-2 font-medium">hoje</span>
       </div>
 
-      {/* Marco zero / quitação */}
+      {/* Quitação */}
       <div className="relative flex flex-col items-center flex-1">
         <div className="w-2.5 h-2.5 rounded-full bg-gain z-10" />
-        <span className="text-xs text-gain mt-2 font-medium">marco zero</span>
+        <span className="text-xs text-gain mt-2 font-medium">quitação</span>
       </div>
 
       {/* Original (tachado) */}
@@ -116,7 +116,7 @@ function Landing() {
     <div className="min-h-screen bg-background text-foreground">
       {/* ── Nav ────────────────────────────────────────────────────────────── */}
       <nav className="flex items-center justify-between px-6 py-5 max-w-2xl mx-auto">
-        <span className="font-serif text-base font-semibold tracking-tight">Marco Zero</span>
+        <span className="font-serif text-base font-semibold tracking-tight">Tenor</span>
         <Link
           to="/onboarding"
           className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -132,14 +132,14 @@ function Landing() {
         </p>
 
         <h1 className="font-serif text-4xl sm:text-5xl font-semibold leading-tight text-foreground mb-6">
-          Cada parcela tem um plano.
+          Entenda seu tenor.
           <br />
-          <span className="text-muted-foreground">Cada plano tem um fim.</span>
+          <span className="text-muted-foreground">Encurte seu prazo.</span>
         </h1>
 
         <p className="text-muted-foreground text-lg leading-relaxed mb-10 max-w-lg mx-auto">
-          Marco Zero é o cofre privado do seu financiamento. Você guarda seu contrato,
-          simula cenários e sabe exatamente quando quita.
+          Tenor é o cofre privado do seu financiamento imobiliário. Guarde seu contrato,
+          simule cenários e saiba exatamente quando quita.
         </p>
 
         <Link
@@ -239,7 +239,7 @@ function Landing() {
       {/* ── Footer ─────────────────────────────────────────────────────────── */}
       <footer className="border-t border-border px-6 py-8 max-w-2xl mx-auto">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span className="font-serif">Marco Zero</span>
+          <span className="font-serif">Tenor</span>
           <span>Conformidade LGPD · Dados no Brasil</span>
         </div>
       </footer>

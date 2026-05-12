@@ -1,4 +1,4 @@
-# Marco Zero — Schema Relacional & Contrato do Parser
+# Tenor — Schema Relacional & Contrato do Parser
 
 > Documento de design — versão 1
 > Data: 06/05/2026
@@ -72,7 +72,7 @@ Valores lookup que antes eram strings soltas (`"itau"`, `"SAC"`, `"itau_v1.0"`) 
 | `display_name` | `text` | NOT NULL | "Itaú Unibanco", "Caixa Econômica Federal" |
 | `short_name` | `text` | NOT NULL | "Itaú", "Caixa", "BB" |
 | `ispb` | `text` | nullable | Código ISPB do Banco Central (identificador oficial) |
-| `has_ddc_parser` | `boolean` | default false | Marco Zero tem parser determinístico para este banco |
+| `has_ddc_parser` | `boolean` | default false | Tenor tem parser determinístico para este banco |
 | `active` | `boolean` | default true | Bancos descontinuados ficam inativos, não deletados |
 
 **Seed inicial:**

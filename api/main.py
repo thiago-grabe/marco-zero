@@ -1,5 +1,5 @@
 """
-Marco Zero — FastAPI backend
+Tenor — FastAPI backend
 """
 
 from contextlib import asynccontextmanager
@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Marco Zero API",
+    title="Tenor API",
     description="Copiloto de quitação imobiliária — motor de cálculo e agentes IA",
     version="0.1.0",
     lifespan=lifespan,

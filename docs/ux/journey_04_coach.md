@@ -1,4 +1,4 @@
-# Marco Zero — Jornada 4: Modo Coach
+# Tenor — Jornada 4: Modo Coach
 
 > **Objetivo**: deixar o produto de **reativo** (responde quando o usuário pergunta) para **ativo** (avisa quando há janela de oportunidade ou risco).
 > **Princípio guia**: o Coach respeita atenção. Avisa quando importa, fica em silêncio quando não importa.
@@ -7,7 +7,7 @@
 
 ## Modelo mental do usuário
 
-> "O Marco Zero olha pro meu contrato 24/7 e me chama quando algo importante acontece."
+> "O Tenor olha pro meu contrato 24/7 e me chama quando algo importante acontece."
 
 O Coach é o motor de **engajamento sustentável**. Faz o usuário voltar não por hábito vazio, mas porque há informação relevante esperando.
 
@@ -291,7 +291,7 @@ O Coach é o motor de **engajamento sustentável**. Faz o usuário voltar não p
 
 ### Decisões
 
-- **Detecção é o que diferencia Marco Zero de simuladores.** Audita o real contra o planejado.
+- **Detecção é o que diferencia Tenor de simuladores.** Audita o real contra o planejado.
 - **Lista causas plausíveis.** Sem assumir má-fé do banco nem do usuário.
 - **3 ações possíveis.** Aceitar desvio, corrigir, investigar.
 
@@ -514,6 +514,6 @@ enviar esse tipo?
 
 - **Coach roda do lado servidor.** Tem acesso ao contrato do usuário (RLS scopado), nada cruza para outros usuários.
 - **Cálculos de alertas são determinísticos.** SAC, FGTS, datas — tudo matemática conhecida, sem IA.
-- **Notificações externas** (e-mail, SMS, push) **não levam dados sensíveis no corpo.** Mensagem genérica + link autenticado para o app. "Você tem um novo alerta no Marco Zero" — não "Sua taxa de 12,19% está acima da Caixa de 11,19%".
+- **Notificações externas** (e-mail, SMS, push) **não levam dados sensíveis no corpo.** Mensagem genérica + link autenticado para o app. "Você tem um novo alerta no Tenor" — não "Sua taxa de 12,19% está acima da Caixa de 11,19%".
 - **Dados de Selic, taxas de mercado** vêm de fontes públicas, não vinculados ao usuário.
 - **Trigger de alerta** roda em batch (job recorrente), não em tempo real — reduz superfície de ataque.

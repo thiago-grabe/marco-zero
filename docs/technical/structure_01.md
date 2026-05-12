@@ -1,4 +1,4 @@
-# Marco Zero — Estrutura do Projeto
+# Tenor — Estrutura do Projeto
 
 > Documento de design — versão 1
 > Data: 06/05/2026

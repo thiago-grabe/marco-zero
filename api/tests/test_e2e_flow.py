@@ -24,7 +24,7 @@ from db.engine import get_session
 from db.rls import get_rls_session
 from middleware.auth import get_current_user_id
 
-TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5490/marco_zero_test"
+TEST_DATABASE_URL = "postgresql+asyncpg://postgres:postgres@localhost:5490/tenor_test"
 test_engine = create_async_engine(TEST_DATABASE_URL, echo=False, poolclass=NullPool)
 TestSession = async_sessionmaker(test_engine, expire_on_commit=False)
 

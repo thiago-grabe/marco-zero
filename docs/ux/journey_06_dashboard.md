@@ -1,4 +1,4 @@
-# Marco Zero — Jornada 6: Dashboard
+# Tenor — Jornada 6: Dashboard
 
 > **Objetivo**: ser legível em 3 segundos. Responder "como estou indo?" sem cliques.
 > **Princípio guia**: a data da quitação é o herói. Tudo o mais é contexto.
@@ -107,7 +107,7 @@ Dashboard é tela mais visitada do produto. **80% das aberturas** terminam aqui 
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  Marco Zero                                  [perfil]    │
+│  Tenor                                  [perfil]    │
 ├──────────────────────────────────────────────────────────┤
 │                                                          │
 │                                                          │

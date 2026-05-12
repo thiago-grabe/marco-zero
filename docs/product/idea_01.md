@@ -1,4 +1,4 @@
-# Marco Zero — Arquitetura de Dados & Estratégia LGPD
+# Tenor — Arquitetura de Dados & Estratégia LGPD
 
 > Documento de ideação — versão 1
 > Data: 06/05/2026
@@ -6,7 +6,7 @@
 
 ## Contexto
 
-Marco Zero é um copiloto de quitação de financiamento imobiliário. Sem integração bancária, opera como **standalone app** que recebe dados estruturados e não estruturados do próprio usuário (PDFs de DDC, entradas manuais, registros de operações). Cada usuário tem um ou mais contratos, possivelmente atrelados a um ou mais imóveis.
+Tenor é um copiloto de quitação de financiamento imobiliário. Sem integração bancária, opera como **standalone app** que recebe dados estruturados e não estruturados do próprio usuário (PDFs de DDC, entradas manuais, registros de operações). Cada usuário tem um ou mais contratos, possivelmente atrelados a um ou mais imóveis.
 
 Este documento define as decisões de produto sobre arquitetura de dados, ingestão e privacidade — sem entrar em implementação técnica.
 
@@ -16,7 +16,7 @@ Este documento define as decisões de produto sobre arquitetura de dados, ingest
 
 Antes de qualquer arquitetura, fixar a metáfora certa pro usuário:
 
-> **"Marco Zero é o seu cofre de financiamentos. Você guarda seus contratos aqui. A inteligência mora dentro."**
+> **"Tenor é o seu cofre de financiamentos. Você guarda seus contratos aqui. A inteligência mora dentro."**
 
 Isso muda tudo:
 
@@ -250,7 +250,7 @@ Convite por e-mail. Permissões: visualização ou edição completa. Audit trai
 
 ### 6.5. Tela "Meus Dados"
 
-A maioria dos produtos esconde isso. Marco Zero dá destaque com uma tela completa mostrando identidade, contratos armazenados, cenários salvos, consentimentos ativos, subprocessadores em uso, e ações (exportar, pausar, excluir).
+A maioria dos produtos esconde isso. Tenor dá destaque com uma tela completa mostrando identidade, contratos armazenados, cenários salvos, consentimentos ativos, subprocessadores em uso, e ações (exportar, pausar, excluir).
 
 ---
 

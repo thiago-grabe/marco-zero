@@ -1,4 +1,4 @@
-# Marco Zero — Jornada 2: Cenários
+# Tenor — Jornada 2: Cenários
 
 > **Objetivo**: brincar com possibilidades sem medo de quebrar nada.
 > **Princípio guia**: cenários são **sandboxes**, não compromissos. O usuário deve sentir que pode explorar agressivamente sem consequências.
@@ -302,7 +302,7 @@ Quando o usuário clica em "Promover" num cenário planejado:
 │                                                          │
 │  ─── O que acontece ───                                  │
 │                                                          │
-│  ✓ Marco Zero passa a usar este como referência.         │
+│  ✓ Tenor passa a usar este como referência.         │
 │  ✓ Coach vai te lembrar dos aportes mensais.             │
 │  ✓ Coach vai te lembrar do aporte anual em abril.        │
 │  ✓ Cenário anterior (R$ 6.578/mês sem extras)            │

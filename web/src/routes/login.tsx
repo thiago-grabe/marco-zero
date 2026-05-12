@@ -62,7 +62,7 @@ function Login() {
     <div className="min-h-screen bg-background flex items-center justify-center px-6">
       <div className="max-w-sm w-full">
         <div className="text-center mb-10">
-          <p className="text-xs text-primary uppercase tracking-widest mb-6">Marco Zero</p>
+          <p className="text-xs text-primary uppercase tracking-widest mb-6">Tenor</p>
           <h1 className="font-serif text-2xl font-semibold mb-2">
             {isRegister ? "Criar conta" : "Entrar"}
           </h1>

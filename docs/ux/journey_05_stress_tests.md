@@ -1,4 +1,4 @@
-# Marco Zero — Jornada 5: Stress Tests
+# Tenor — Jornada 5: Stress Tests
 
 > **Objetivo**: responder honestamente a pergunta "e se as coisas derem errado (ou certo)?".
 > **Princípio guia**: stress test não é alarme — é exercício mental que **prepara** o usuário para realidade incerta.
@@ -496,7 +496,7 @@ Esta tela aparece automaticamente quando o usuário tenta rodar stress test pela
 │  ─── Atualização ──────────────────────────────          │
 │                                                          │
 │  Recomendamos revisar esses valores a cada 6 meses.      │
-│  Marco Zero vai te lembrar.                              │
+│  Tenor vai te lembrar.                              │
 │                                                          │
 │  [ Salvar e rodar stress ]                               │
 │                                                          │
