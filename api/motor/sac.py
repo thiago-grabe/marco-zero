@@ -431,6 +431,79 @@ def compare_scenarios(
     return {"base": base, "cenarios": resultados, "marginal": marginal}
 
 
+# ── Planilha parcela a parcela ───────────────────────────────────────────────────
+
+def generate_installment_schedule(
+    saldo: float,
+    prazo_remanescente: int,
+    taxa_mensal: float,
+    amortizacao_mensal: float,
+    mip_mensal: float,
+    dfi_mensal: float,
+    data_proxima_parcela: date,
+    aporte_mensal_extra: float = 0.0,
+    aporte_anual_extra: float = 0.0,
+    mes_aporte_anual: int | None = None,
+) -> list[dict]:
+    """
+    Gera planilha completa parcela a parcela até a quitação.
+    Cada linha é um mês com: número, data, saldo, amortização, juros,
+    seguros, parcela total, extra mensal, extra anual, saldo pós.
+
+    Retorna lista de dicts prontos para CSV/download.
+    """
+    rows = []
+    saldo_corrente = saldo
+    data_corrente = data_proxima_parcela
+    parcela_num = 1
+
+    for _ in range(prazo_remanescente + 24):  # margem
+        if saldo_corrente <= 0.01:
+            break
+
+        juros = round(saldo_corrente * taxa_mensal, 2)
+        amort_reg = round(min(amortizacao_mensal, saldo_corrente), 2)
+        seguros = round(mip_mensal + dfi_mensal, 2)
+        parcela = round(amort_reg + juros + seguros, 2)
+
+        extra_m = 0.0
+        extra_a = 0.0
+
+        saldo_pos = round(saldo_corrente - amort_reg, 2)
+
+        if aporte_mensal_extra > 0:
+            extra_m = round(min(aporte_mensal_extra, saldo_pos), 2)
+            saldo_pos = round(saldo_pos - extra_m, 2)
+
+        if aporte_anual_extra > 0 and mes_aporte_anual == data_corrente.month:
+            extra_a = round(min(aporte_anual_extra, saldo_pos), 2)
+            saldo_pos = round(saldo_pos - extra_a, 2)
+
+        saldo_pos = max(0.0, saldo_pos)
+
+        rows.append({
+            "parcela": parcela_num,
+            "data": str(data_corrente),
+            "saldo_anterior": round(saldo_corrente, 2),
+            "amortizacao": amort_reg,
+            "juros": juros,
+            "seguros": seguros,
+            "parcela_total": parcela,
+            "extra_mensal": extra_m,
+            "extra_anual": extra_a,
+            "saldo_pos": saldo_pos,
+        })
+
+        saldo_corrente = saldo_pos
+        data_corrente = add_months(data_corrente, 1)
+        parcela_num += 1
+
+        if saldo_corrente <= 0.01:
+            break
+
+    return rows
+
+
 # ── Helpers internos ────────────────────────────────────────────────────────────
 
 def _total_interest_sac(

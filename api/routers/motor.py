@@ -132,5 +132,28 @@ async def project_scenario(req: ProjectDirectRequest):
 async def compare_scenarios(req: CompareRequest):
     """Compara até 4 cenários e retorna análise marginal."""
     # TODO: buscar ContractState do DB pelo contract_id
-    # Por ora, retorna erro orientativo
     return {"detail": "Implementar: buscar ContractState do DB para compare_scenarios"}
+
+
+@router.post("/schedule")
+async def generate_schedule(req: ProjectDirectRequest):
+    """
+    Gera planilha completa parcela a parcela até a quitação.
+    Retorna array com uma linha por mês: parcela, data, saldo, amortização,
+    juros, seguros, extras, saldo pós-pagamento.
+
+    Usado pelo frontend para download de CSV.
+    """
+    rows = sac.generate_installment_schedule(
+        saldo=req.saldo,
+        prazo_remanescente=req.prazo_remanescente,
+        taxa_mensal=req.taxa_mensal,
+        amortizacao_mensal=req.amortizacao_mensal,
+        mip_mensal=req.mip_mensal,
+        dfi_mensal=req.dfi_mensal,
+        data_proxima_parcela=req.data_proxima_parcela,
+        aporte_mensal_extra=req.aporte_mensal_extra,
+        aporte_anual_extra=req.aporte_anual_extra,
+        mes_aporte_anual=req.mes_aporte_anual,
+    )
+    return rows

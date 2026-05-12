@@ -133,10 +133,19 @@ async def chat(
                             yield _sse("text", {"content": text})
 
                 elif isinstance(event, RawResponsesStreamEvent):
-                    # Chunks de texto para streaming progressivo
+                    # Chunks de texto para streaming progressivo.
+                    # IMPORTANTE: filtrar deltas de tool call arguments (JSON) —
+                    # só emitir deltas de texto real do assistente.
                     data = event.data
-                    if hasattr(data, "delta") and data.delta:
-                        yield _sse("text_delta", {"delta": data.delta})
+                    if hasattr(data, "type") and data.type == "output_text_delta":
+                        delta = getattr(data, "delta", "")
+                        if delta:
+                            yield _sse("text_delta", {"delta": delta})
+                    elif hasattr(data, "delta") and isinstance(data.delta, str):
+                        # Fallback: só emitir se não parecer JSON de argumentos
+                        delta = data.delta
+                        if delta and not delta.startswith("{") and not delta.startswith('"'):
+                            yield _sse("text_delta", {"delta": delta})
 
             yield _sse("done", {"status": "ok"})
 

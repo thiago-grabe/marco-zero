@@ -31,6 +31,32 @@ export function formatRate(rate: number, decimals = 4): string {
   return (rate * 100).toFixed(decimals).replace(".", ",") + "%";
 }
 
+/**
+ * Gera e faz download de um arquivo CSV.
+ * Útil para exportar planilhas de amortização.
+ */
+export function downloadCSV(filename: string, headers: string[], rows: (string | number)[][]): void {
+  const bom = "\uFEFF"; // BOM para Excel abrir com encoding correto
+  const sep = ";"; // separador ponto-e-vírgula para locale BR
+  const headerLine = headers.join(sep);
+  const dataLines = rows.map((row) =>
+    row.map((cell) => {
+      if (typeof cell === "number") {
+        return cell.toFixed(2).replace(".", ","); // formato BR
+      }
+      return `"${String(cell).replace(/"/g, '""')}"`;
+    }).join(sep)
+  );
+  const csv = bom + [headerLine, ...dataLines].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 /** Usa debounce para reduzir chamadas ao motor nos sliders. */
 export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
   fn: T,

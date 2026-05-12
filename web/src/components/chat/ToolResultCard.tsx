@@ -6,8 +6,8 @@
  */
 
 import { useState, type ReactNode } from "react";
-import { Calculator, TrendingDown, BarChart3, Wallet, Calendar, ChevronDown, ChevronRight } from "lucide-react";
-import { formatBRL, formatMonthYear, formatRate } from "@/lib/utils";
+import { Calculator, TrendingDown, BarChart3, Wallet, Calendar, ChevronDown, ChevronRight, Download } from "lucide-react";
+import { formatBRL, formatMonthYear, formatRate, downloadCSV } from "@/lib/utils";
 import type {
   ActionHandler,
   AmortizationResult,
@@ -24,15 +24,17 @@ function CardShell({
   title,
   children,
   actions,
+  toolName,
   raw,
 }: {
   icon: ReactNode;
   title: string;
   children: ReactNode;
   actions?: ReactNode;
+  toolName?: string;
   raw?: string;
 }) {
-  const [showRaw, setShowRaw] = useState(false);
+  const [showExplain, setShowExplain] = useState(false);
 
   return (
     <div className="border border-border rounded-lg p-5 bg-card my-3">
@@ -48,21 +50,85 @@ function CardShell({
       {raw && (
         <div className="mt-3 pt-3 border-t border-border">
           <button
-            onClick={() => setShowRaw(!showRaw)}
+            onClick={() => setShowExplain(!showExplain)}
             className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
           >
-            {showRaw ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+            {showExplain ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
             Como chegamos aqui
           </button>
-          {showRaw && (
-            <pre className="mt-2 bg-muted rounded p-3 text-xs text-muted-foreground overflow-x-auto max-h-48">
-              {JSON.stringify(JSON.parse(raw), null, 2)}
-            </pre>
+          {showExplain && (
+            <ExplainSteps toolName={toolName} raw={raw} />
           )}
         </div>
       )}
     </div>
   );
+}
+
+/** Explicação amigável dos passos do cálculo (não JSON bruto). */
+function ExplainSteps({ toolName, raw }: { toolName?: string; raw: string }) {
+  let data: Record<string, unknown> = {};
+  try { data = JSON.parse(raw); } catch { /* */ }
+
+  const steps = buildExplanation(toolName ?? "", data);
+
+  return (
+    <div className="mt-2 space-y-2">
+      {steps.map((step, i) => (
+        <div key={i} className="flex gap-2 items-start">
+          <span className="text-xs text-muted-foreground shrink-0 w-4 text-right">{i + 1}.</span>
+          <p className="text-xs text-muted-foreground leading-relaxed">{step}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function buildExplanation(tool: string, data: Record<string, unknown>): string[] {
+  switch (tool) {
+    case "simular_amortizacao":
+      return [
+        `Calculamos o saldo devedor após subtrair o valor da amortização e somar os juros pró-rata (${formatBRL(Number(data.juros_pro_rata ?? 0))}).`,
+        `O novo saldo ficou em ${formatBRL(Number(data.saldo_novo ?? 0))}.`,
+        `Com o prazo recalculado, ${data.parcelas_eliminadas} parcelas foram eliminadas.`,
+        `A economia total em juros foi de ${formatBRL(Number(data.juros_economizados_nominal ?? 0))} em valor nominal.`,
+        `O retorno efetivo da operação é equivalente a ${formatRate(Number(data.retorno_efetivo_aa ?? 0))} a.a. — a taxa do próprio contrato.`,
+        "Cálculo determinístico pelo motor SAC. A IA não participou desta conta.",
+      ];
+    case "projetar_cenario":
+      return [
+        "O motor simulou mês a mês, aplicando a amortização regular + aportes extras configurados.",
+        `Projeção até a quitação: ${formatMonthYear(String(data.data_quitacao ?? ""))} (${data.prazo_meses} meses).`,
+        `Total de juros pagos: ${formatBRL(Number(data.total_juros_pagos ?? 0))}.`,
+        `Economia comparada ao plano sem extras: ${formatBRL(Number(data.total_juros_economizados ?? 0))}.`,
+        "Cada mês: saldo = saldo anterior − amortização regular − extra mensal − (extra anual se for o mês configurado).",
+        "Cálculo determinístico pelo motor SAC. Nenhum valor foi estimado pela IA.",
+      ];
+    case "comparar_cenarios":
+      return [
+        "O motor projetou cada cenário separadamente e depois comparou os resultados.",
+        "A análise marginal mostra o retorno incremental de cada upgrade.",
+        "Retorno marginal = (juros economizados a mais) / (extra investido a mais).",
+        "Recomendação 'sim' = retorno > 0,80; 'depende' = 0,40–0,80; 'não' = < 0,40.",
+        "Todos os cenários usam o mesmo saldo base e a mesma taxa.",
+      ];
+    case "calcular_parcela":
+      return [
+        "Amortização SAC = saldo devedor ÷ prazo remanescente.",
+        `Juros = saldo × taxa mensal = ${formatBRL(Number(data.juros ?? 0))}.`,
+        "Seguros (MIP + DFI) variam com o saldo e a idade do mutuário.",
+        "Total = amortização + juros + seguros.",
+      ];
+    case "calcular_pro_rata":
+      return [
+        `Juros pró-rata calculados para ${data.dias_decorridos} dias decorridos.`,
+        "Fórmula: saldo × taxa mensal × (dias / 30).",
+        `Resultado: ${formatBRL(Number(data.juros_pro_rata ?? 0))} de juros adicionais.`,
+        "Esses juros são cobrados junto com o valor da amortização extraordinária.",
+      ];
+    default:
+      return ["Cálculo executado pelo motor. Detalhes não disponíveis para esta ferramenta."];
+  }
 }
 
 function ActionBtn({ label, onClick }: { label: string; onClick: () => void }) {
@@ -95,6 +161,7 @@ function AmortizationCard({ data, raw, onAction }: { data: AmortizationResult; r
     <CardShell
       icon={<TrendingDown size={12} />}
       title="Impacto da amortização"
+      toolName="simular_amortizacao"
       raw={raw}
       actions={
         <>
@@ -118,13 +185,32 @@ function AmortizationCard({ data, raw, onAction }: { data: AmortizationResult; r
 function ProjectionCard({ data, raw, onAction }: { data: ScenarioProjectionResult; raw: string; onAction: ActionHandler }) {
   const [showSchedule, setShowSchedule] = useState(false);
 
+  function handleDownloadCSV() {
+    const headers = ["Ano", "Parcela início", "Parcela fim", "Saldo início", "Saldo fim", "Amort regular", "Extra mensal", "Extra anual", "FGTS", "Juros pagos"];
+    const rows = data.schedule.map((y) => [
+      y.ano, y.parcela_inicio, y.parcela_fim, y.saldo_inicio, y.saldo_fim,
+      y.amort_regular, y.amort_extra_mensal, y.amort_extra_anual, y.fgts_aplicado, y.juros_pagos,
+    ]);
+    downloadCSV(`marco-zero-projecao-${data.data_quitacao}.csv`, headers, rows);
+  }
+
   return (
     <CardShell
       icon={<BarChart3 size={12} />}
       title="Projeção de cenário"
+      toolName="projetar_cenario"
       raw={raw}
       actions={
-        <ActionBtn label="Simular variação" onClick={() => onAction({ type: "prefill", text: "E se eu amortizar R$ " })} />
+        <>
+          <ActionBtn label="Simular variação" onClick={() => onAction({ type: "prefill", text: "E se eu amortizar R$ " })} />
+          <button
+            onClick={handleDownloadCSV}
+            className="text-xs text-muted-foreground hover:text-foreground border border-border
+                       rounded px-3 py-1.5 transition-colors hover:bg-muted flex items-center gap-1"
+          >
+            <Download size={10} /> Baixar planilha
+          </button>
+        </>
       }
     >
       <div className="mb-3">
@@ -189,7 +275,7 @@ function ComparisonCard({ data, raw }: { data: ComparisonResult; raw: string; on
   const recIcons: Record<string, string> = { sim: "✓", depende: "⚠", nao: "✗" };
 
   return (
-    <CardShell icon={<BarChart3 size={12} />} title="Comparação de cenários" raw={raw}>
+    <CardShell icon={<BarChart3 size={12} />} title="Comparação de cenários" toolName="comparar_cenarios" raw={raw}>
       <div className="border border-border rounded overflow-hidden mb-3">
         <table className="w-full text-xs">
           <thead className="bg-muted">
@@ -250,7 +336,7 @@ function ComparisonCard({ data, raw }: { data: ComparisonResult; raw: string; on
 
 function InstallmentCard({ data, raw }: { data: InstallmentResult; raw: string; onAction: ActionHandler }) {
   return (
-    <CardShell icon={<Wallet size={12} />} title="Composição da parcela" raw={raw}>
+    <CardShell icon={<Wallet size={12} />} title="Composição da parcela" toolName="calcular_parcela" raw={raw}>
       <div className="space-y-0.5">
         <MetricRow label="Amortização" value={formatBRL(data.amortizacao)} />
         <MetricRow label="Juros" value={formatBRL(data.juros)} color="text-loss" />
@@ -265,7 +351,7 @@ function InstallmentCard({ data, raw }: { data: InstallmentResult; raw: string; 
 
 function ProRataCard({ data, raw }: { data: ProRataResult; raw: string; onAction: ActionHandler }) {
   return (
-    <CardShell icon={<Calendar size={12} />} title="Juros pró-rata" raw={raw}>
+    <CardShell icon={<Calendar size={12} />} title="Juros pró-rata" toolName="calcular_pro_rata" raw={raw}>
       <div className="space-y-0.5">
         <MetricRow label="Dias decorridos" value={String(data.dias_decorridos)} />
         <MetricRow label="Juros pró-rata" value={formatBRL(data.juros_pro_rata)} color="text-loss" />
