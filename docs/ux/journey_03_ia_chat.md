@@ -1,327 +1,183 @@
-# Tenor — Jornada 3: IA Chat
+# Tenor — Jornada 3: Chat IA (versão massa)
 
-> **Objetivo**: dar ao usuário um analista financeiro disponível 24/7 que conhece o contrato dele em detalhe.
-> **Princípio guia**: a IA explica e compara, **nunca decide**. Toda recomendação termina com "a decisão é sua" e mostra a matemática.
+> **Objetivo**: ser o **tradutor** do financiamento — substituir o "ligar pro gerente e não entender a resposta" por uma explicação em português, com a conta à mostra.
+> **Princípio guia**: para a massa, esta é provavelmente a **feature killer**. As perguntas de ouro são de **tradução e desconfiança**, não de otimização.
+>
+> Invariante do produto (vale para todos os públicos): **a IA nunca calcula**. Todo número vem do motor determinístico, via tool. A IA escolhe a tool e explica o resultado.
 
 ---
 
-## Modelo mental do usuário
+## Modelo mental do usuário (massa)
 
-> "Quero perguntar em português qualquer dúvida sobre o meu contrato e receber resposta clara, sem precisar abrir 5 abas."
+> "Eu queria perguntar uma coisa boba sem o gerente me olhar torto. Por que minha parcela subiu? Esse seguro é obrigatório mesmo? Será que me enganaram na taxa?"
 
-A IA é o lugar onde o produto mais se aproxima da promessa de "copiloto". Mas é também onde mais pode dar errado: alucinação, conselho ruim, vazamento de dados.
+O usuário quer fazer a pergunta com as palavras dele, sem vergonha, e receber resposta clara — e quer sentir que tem alguém do lado dele, não do lado do banco.
 
 ---
 
 ## Princípios duros
 
-1. **A IA tem acesso de leitura aos dados do contrato ATIVO, e somente esse.** Nunca dados de outros usuários, nunca dados agregados sem opt-in.
-2. **A IA explica, não decide.** Toda recomendação termina com "a decisão é sua". Toda análise mostra a matemática.
-3. **A IA cita a fonte de cada número.** Se ela diz "seu saldo é R$ 429k", aparece chip discreto: "do DDC de 05/05/2026".
-4. **A IA tem limites declarados.** Não recomenda investimentos por nome (CDB do banco X), não fala sobre outros produtos financeiros, não opina sobre o futuro do mercado, não dá conselho jurídico.
-5. **A IA jamais executa ações.** Ela não pode amortizar, mudar plano, transferir nada. Apenas informa e simula.
+1. **Tradução primeiro.** Explicar o contrato em português é o valor central.
+2. **Mostre a conta.** Toda resposta numérica exibe a conta e oferece "como chegou nisso?".
+3. **Tom acolhedor, não técnico-frio.** A massa chega insegura; recusa nunca humilha.
+4. **Ponte natural para o guardião.** Quase toda dúvida termina em "quer que eu confira com o banco?".
+5. **Recusa construtiva.** Investimento específico, jurídico e previsão de Selic: recusa + alternativa no escopo.
 
 ---
 
-## Tela 3.1 — Estado inicial (sem conversa)
+## Tela 3.1 — Chat com sugestões de massa
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  ←  Apartamento Contagem (Itaú)         [Histórico]      │
+│  ←  Tire suas dúvidas                                    │
 │                                                          │
-│  IA — Tenor                                         │
+│  Pergunte com suas palavras. Eu explico em português     │
+│  e mostro a conta.                                       │
 │                                                          │
-│  ┌──────────────────────────────────────────────┐        │
-│  │                                              │        │
-│  │  Olá. Vou usar dados do seu contrato         │        │
-│  │  para responder. Pergunte o que quiser       │        │
-│  │  sobre quitação, amortização, FGTS,          │        │
-│  │  portabilidade ou cenários.                  │        │
-│  │                                              │        │
-│  │  Sugestões:                                  │        │
-│  │   ▸ Quanto economizo amortizando R$ 30k?     │        │
-│  │   ▸ Vale portar pro Caixa hoje?              │        │
-│  │   ▸ E se eu perder o emprego?                │        │
-│  │   ▸ Quando devo usar FGTS?                   │        │
-│  │   ▸ Compare meus 3 cenários                  │        │
-│  │                                              │        │
-│  └──────────────────────────────────────────────┘        │
+│  Perguntas comuns:                                       │
+│   ▸ Por que minha parcela aumentou esse mês?             │
+│   ▸ Esse seguro (MIP/DFI) é obrigatório?                 │
+│   ▸ Fui enganado nessa taxa de juros?                    │
+│   ▸ Vale a pena adiantar um pouquinho?                   │
+│   ▸ O que é essa "TR" que aparece no meu contrato?       │
+│   ▸ Por que tão pouco da parcela abate a dívida?         │
 │                                                          │
-│                                                          │
-│  ┌──────────────────────────────────────────┐  ┌──┐      │
-│  │ Pergunta…                                │  │ →│      │
-│  └──────────────────────────────────────────┘  └──┘      │
-│                                                          │
-│  🔒 Conversa não treina modelos. Histórico 30 dias.      │
+│  [  Escrever minha pergunta...                        ]  │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **Sugestões de pergunta são contextuais.** Mudam conforme o estado do contrato. Se FGTS está perto da janela, sugere "quando devo usar FGTS?". Se acabou de subir DDC, sugere "o que mudou?".
-- **Caveat de privacidade fica visível e curto.** Sem precisar clicar "saiba mais".
-- **Botão histórico** abre lateral com conversas anteriores (até 30 dias para Plus, 90 para Avançado).
-- **Sem mascote, sem balão "olá!" piscando.** Tom neutro de analista.
+- **Sugestões são perguntas reais de massa.** Tradução e desconfiança, nunca "compare meus 3 cenários".
+- **Campo aberto convida pergunta com as próprias palavras.**
 
 ---
 
-## Tela 3.2 — Estrutura de uma resposta
-
-Quando o usuário pergunta, a resposta tem **estrutura fixa de 3 camadas**:
+## Tela 3.2 — Resposta de tradução (com a conta)
 
 ```
 ┌──────────────────────────────────────────────────────────┐
 │  Você                                                    │
-│  Vale a pena portar pro Caixa?                           │
+│  Por que minha parcela subiu de R$ 1.210 pra R$ 1.247?   │
 │                                                          │
-│  ─────────────────────────────────────────────────       │
+│  ──────────────────────────────────────────────────      │
+│  Tenor                                                   │
 │                                                          │
-│  IA — Tenor                                         │
+│  Subiu R$ 37. Quase tudo é correção monetária — a TR     │
+│  aplicada sobre o saldo. Veja:                           │
 │                                                          │
-│  ─── Resposta direta ───                                 │
+│    Correção do saldo (TR)        + R$ 31                 │
+│    Reajuste dos seguros          + R$  6                 │
+│    ─────────────────────────────────────                 │
+│    Aumento total                 + R$ 37  ✓              │
 │                                                          │
-│  Provavelmente sim. Sua taxa de 12,19% está              │
-│  ~100bps acima da média Caixa SBPE de 11,19%             │
-│  em maio/2026.                                           │
+│  Isso é normal e previsto em contrato — não é erro.      │
+│  Quer que eu confira se a TR aplicada bate com a TR      │
+│  oficial do período?                                     │
 │                                                          │
-│  ─── Análise ───                                         │
-│                                                          │
-│  Saldo:        R$ 429.629,87  ⓘ DDC 05/05                │
-│  Sua taxa:     12,19% a.a.    ⓘ DDC 05/05                │
-│  Caixa SBPE:   11,19% a.a.    ⓘ pesquisa pública 06/05   │
-│                                                          │
-│  Em 189 parcelas restantes:                              │
-│  • Juros se ficar:    R$ 391k                            │
-│  • Juros se portar:   R$ 340k                            │
-│  • Economia bruta:    R$ 51k                             │
-│                                                          │
-│  Custos da operação:                                     │
-│  • Cartório:          ~R$ 3.500                          │
-│  • Avaliação imóvel:  ~R$ 1.000                          │
-│  • Total estimado:    ~R$ 4.500                          │
-│                                                          │
-│  Payback: 7 meses                                        │
-│                                                          │
-│  ─── Caveats ───                                         │
-│                                                          │
-│  • Caixa pode oferecer taxa diferente após análise       │
-│    de crédito real. A taxa de tabela é referência.       │
-│  • Itaú tem direito a contraproposta — você tem          │
-│    5 dias úteis pra avaliar.                             │
-│  • Não considera mudança de seguros MIP/DFI, que         │
-│    podem ajudar ou atrapalhar.                           │
-│  • Selic está em queda projetada (15% → 13% até          │
-│    fim de 2026). Se esperar, taxas podem cair mais.      │
-│                                                          │
-│  ─── Ações ───                                           │
-│                                                          │
-│  [ Abrir simulação detalhada ]                           │
-│  [ Como vocês chegaram nisso? ]                          │
-│  [ Salvar como cenário ]                                 │
-│                                                          │
-│                                                          │
-│  ┌──────────────────────────────────────────┐  ┌──┐      │
-│  │ Continuar perguntando…                   │  │ →│      │
-│  └──────────────────────────────────────────┘  └──┘      │
+│  [ Sim, conferir ]   [ Como chegou nesse número? ]       │
+│                              👍   👎                      │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
-### Anatomia da resposta
-
-| Seção | O que faz |
-|---|---|
-| **Resposta direta** | 1-2 frases. Resposta literal à pergunta. |
-| **Análise** | A matemática. Cada número com fonte. |
-| **Caveats** | O que pode dar errado, o que não foi considerado. Nunca omitido. |
-| **Ações** | CTAs concretos: simular, ver cálculo, salvar. |
-
 ### Decisões
-
-- **Estrutura é a mesma toda vez.** Previsibilidade gera confiança. Usuário sabe onde olhar.
-- **Citações inline (`ⓘ DDC 05/05`)** abrem o documento ou fonte ao clicar.
-- **"Como vocês chegaram nisso?"** abre modal com fórmula completa (Tela 3.3).
-- **Sem emojis na resposta.** Tom técnico-respeitoso.
-- **"Salvar como cenário"** transforma a análise em cenário oficial — integra com Jornada 2.
+- **A conta aparece sempre.** Transparência é o que diferencia de "perguntar pro gerente".
+- **Ponte para o guardião** ("quer que eu confira?") fecha a resposta.
+- **Feedback 👍/👎** por resposta — detecta alucinação e mede satisfação.
 
 ---
 
-## Tela 3.3 — "Como vocês chegaram nisso?" (auditoria de resposta)
+## Tela 3.2.1 — "Como chegou nesse número?"
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  ←  Memória de cálculo                                   │
+│  ←  Como chegamos nisso                                  │
 │                                                          │
-│  Pergunta original:                                      │
-│  "Vale a pena portar pro Caixa?"                         │
+│  Você perguntou: por que a parcela subiu R$ 37?          │
 │                                                          │
-│  Resposta gerada em: 06/05/2026 às 14:23                 │
+│  Eu usei o cálculo do Tenor (não "chutei"):              │
 │                                                          │
-│  ─── Dados usados ───                                    │
+│   Saldo do mês anterior        R$ 431.200,00             │
+│   TR do período                0,0723%                   │
+│   Correção (saldo × TR)        R$ 31,18                  │
+│   Reajuste anual dos seguros   R$ 5,90                   │
+│   ───────────────────────────────────                    │
+│   Diferença na parcela         R$ 37,08                  │
 │                                                          │
-│  Do seu contrato (DDC 05/05/2026):                       │
-│    saldo_devedor      = R$ 429.629,87                    │
-│    taxa_mensal        = 0,9631393%                       │
-│    taxa_anual_efetiva = 12,19%                           │
-│    parcelas_restantes = 189                              │
-│    sistema            = SAC                              │
-│                                                          │
-│  De pesquisa pública (06/05/2026):                       │
-│    caixa_sbpe_taxa    = 11,19% + TR (≈ 11,5% a.a.)       │
-│    fonte: tabela pública Caixa, validada                 │
-│      em larya.com.br/blog/...                            │
-│                                                          │
-│  ─── Fórmula aplicada ───                                │
-│                                                          │
-│  Juros totais (cenário SAC):                             │
-│    juros = Σ (saldo_t × taxa_mensal)                     │
-│    onde saldo_t decresce conforme amortização SAC        │
-│                                                          │
-│  Cenário "ficar":                                        │
-│    juros_total = R$ 391.034 (188 parcelas restantes)     │
-│                                                          │
-│  Cenário "portar":                                       │
-│    juros_total = R$ 339.821 (mesmo prazo, taxa 11,19%)   │
-│                                                          │
-│  Economia bruta = 391.034 − 339.821 = R$ 51.213          │
-│                                                          │
-│  Custos de portabilidade (referência mercado):           │
-│    cartório = R$ 3.500                                   │
-│    avaliação = R$ 1.000                                  │
-│    custos_total = R$ 4.500                               │
-│                                                          │
-│  Payback = custos_total / economia_mensal_média          │
-│  Payback ≈ 7 meses                                       │
-│                                                          │
-│  ─── Limitações desta análise ───                        │
-│                                                          │
-│  • Taxa Caixa é de tabela pública; taxa real pode        │
-│    diferir após análise de crédito.                      │
-│  • Custos de portabilidade variam por cartório e         │
-│    cidade (estimativa para Belo Horizonte).              │
-│  • Não considera mudança de seguros MIP/DFI.             │
-│  • Não considera tendência futura de Selic.              │
-│                                                          │
-│  ─── Modelo usado ───                                    │
-│                                                          │
-│  Cálculos: motor determinístico Tenor (Python)      │
-│  Geração de texto: Claude (Anthropic) — Zero Data        │
-│    Retention                                             │
-│                                                          │
-│  Dados enviados ao LLM (após redaction):                 │
-│  • Saldo, taxas, prazo (números)                         │
-│  • Pergunta original do usuário                          │
-│  • Resultados dos cálculos                               │
-│                                                          │
-│  Dados NÃO enviados:                                     │
-│  • Seu nome                                              │
-│  • CPF (já não consta nos dados armazenados)             │
-│  • Conta, agência                                        │
-│                                                          │
-│  [ Reportar erro nesta análise ]                         │
+│  Os números do contrato vêm de você/do seu boleto.       │
+│  O cálculo é determinístico — não é a IA inventando.     │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **Auditoria total.** Tudo que entrou, fórmula, tudo que saiu, modelo usado.
-- **"Reportar erro"** envia feedback direto para o time. Importante para detectar alucinação ou bug.
-- **Lista de dados NÃO enviados** é tão importante quanto a lista de enviados — comunica disciplina.
-- **Limitações listadas explicitamente.** Honestidade sobre o que a análise não cobriu.
+- **Rastreabilidade total.** Toda recomendação/explicação tem o caminho do número.
+- **Reforça a separação IA × motor** — combate a desconfiança de "a IA inventou".
 
 ---
 
-## Tela 3.4 — Limites da IA
-
-Quando o usuário faz pergunta fora do escopo:
+## Tela 3.3 — "Esse seguro é obrigatório?" (tradução de armadilha comum)
 
 ```
 ┌──────────────────────────────────────────────────────────┐
 │  Você                                                    │
-│  Devo investir em PETR4?                                 │
+│  Esse MIP e DFI são obrigatórios? Posso tirar?           │
 │                                                          │
-│  ─────────────────────────────────────────────────       │
+│  ──────────────────────────────────────────────────      │
+│  Tenor                                                   │
 │                                                          │
-│  IA — Tenor                                         │
+│  São dois seguros obrigatórios por lei em financiamento  │
+│  imobiliário:                                            │
+│   • MIP (R$ 94/mês): cobre morte/invalidez — se algo     │
+│     te acontecer, quita o saldo.                         │
+│   • DFI (R$ 39/mês): cobre danos ao imóvel.              │
 │                                                          │
-│  Não recomendo ações específicas. Tenor foca        │
-│  em decisões sobre seu financiamento imobiliário.        │
-│                                                          │
-│  Posso te ajudar com:                                    │
-│   ▸ Comparar amortizar vs investir em renda fixa         │
-│     (CDB, LCI, Tesouro) sem nomear instituições          │
-│   ▸ Avaliar portabilidade do seu contrato                │
-│   ▸ Simular cenários de aporte                           │
-│                                                          │
-│  Para análise de ações específicas, consulte um          │
-│  assessor de investimentos certificado pela CVM.         │
+│  Não dá pra tirar, mas você PODE contratar com outra     │
+│  seguradora (portabilidade de seguro) — às vezes sai     │
+│  mais barato que a do banco. Quer entender como?         │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
-### Pergunta sobre futuro / especulação
+### Decisões
+- **Traduz a sigla e o valor**, depois dá a saída prática (portabilidade de seguro) — informação que o banco não oferece.
+- **Honestidade**: "é obrigatório" sem enrolação, mas com o caminho útil.
+
+---
+
+## Tela 3.4 — Recusa construtiva (tom de massa)
 
 ```
-Você
-A Selic vai cair pra 10% até o fim do ano?
-
-─────────────────────────────────────────────────
-
-IA — Tenor
-
-Não posso prever Selic futura. Posso te mostrar
-o que o mercado projeta hoje (Boletim Focus do
-Banco Central):
-
-  • Selic projetada para fim de 2026: 13%
-  • Selic projetada para 2027: 11%
-  • Selic projetada para 2028: 10%
-
-Fonte: Boletim Focus de 04/05/2026.
-
-Essas projeções são estimativas, não garantias.
-Eventos macroeconômicos podem mudar tudo rápido.
-
-Quer que eu simule cenários do seu contrato em
-função de diferentes níveis de Selic futura?
+┌──────────────────────────────────────────────────────────┐
+│  Você                                                    │
+│  Devo investir em PETR4 em vez de adiantar?              │
+│                                                          │
+│  ──────────────────────────────────────────────────      │
+│  Tenor                                                   │
+│                                                          │
+│  Não recomendo ações específicas — não é o meu papel     │
+│  e seria leviano. Mas posso te mostrar, com a sua        │
+│  conta:                                                  │
+│   ▸ o que acontece se você adiantar um pouco             │
+│   ▸ adiantar vs deixar numa renda fixa simples           │
+│     (sem indicar instituição)                            │
+│                                                          │
+│  Pra ações específicas, vale falar com um assessor       │
+│  certificado pela CVM.                                   │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
 ```
 
-### Pergunta jurídica
+### Outras recusas (mesmo padrão)
 
-```
-Você
-Posso parar de pagar a parcela?
+**Previsão de Selic** → não prevê; mostra o que o mercado projeta hoje (Boletim Focus, com fonte e data) e oferece simular o contrato em diferentes níveis de Selic.
 
-─────────────────────────────────────────────────
-
-IA — Tenor
-
-Não posso dar conselho jurídico. Inadimplência
-em financiamento imobiliário tem consequências
-sérias (notificação, leilão extrajudicial, perda
-do imóvel) que dependem do seu contrato e da
-legislação vigente.
-
-Se você está com dificuldade real de pagar:
-• Procure o banco antes de atrasar — eles têm
-  programas de renegociação.
-• Considere conversar com um advogado especializado
-  em direito imobiliário.
-• Em casos extremos, a Defensoria Pública orienta
-  mutuários em risco de perda do imóvel.
-
-Posso te ajudar a entender como sua parcela se
-comportaria em diferentes cenários de renda
-(stress test).
-```
+**Conselho jurídico** ("posso parar de pagar?") → não dá conselho jurídico; explica as consequências em linguagem simples, sugere procurar o banco antes de atrasar e, em risco real, a Defensoria.
 
 ### Decisões
-
-- **Recusa é sempre construtiva.** Sugere alternativa dentro do escopo.
-- **Recusa não é desculpa.** Tom firme, direto.
-- **Sugere recurso externo apropriado** quando relevante (CVM, advogado, Defensoria).
+- **Recusa sempre vira alternativa no escopo.** Nunca é beco sem saída.
+- **Tom firme, mas acolhedor** — a massa não pode se sentir burra por perguntar.
 
 ---
 
@@ -329,144 +185,49 @@ comportaria em diferentes cenários de renda
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  ←  Histórico de conversas                               │
+│  ←  Suas dúvidas                                         │
 │                                                          │
-│  Você tem 12 conversas dos últimos 30 dias.              │
+│  ── Hoje ──                                              │
+│   🕒 14:23  Por que minha parcela subiu?                 │
+│             [ Reabrir ]  [ Apagar ]                      │
 │                                                          │
-│  ─── Hoje ───                                            │
-│                                                          │
-│  🕒 14:23  Vale a pena portar pro Caixa?                 │
-│            [Reabrir]  [Apagar]                           │
-│                                                          │
-│  ─── Ontem ───                                           │
-│                                                          │
-│  🕒 19:47  Quando devo usar FGTS?                        │
-│            [Reabrir]  [Apagar]                           │
-│                                                          │
-│  🕒 16:12  Compare meus 3 cenários                       │
-│            [Reabrir]  [Apagar]                           │
-│                                                          │
-│  ─── Semana passada ───                                  │
-│                                                          │
-│  🕒 28/04  Quanto economizo amortizando R$ 80k?          │
-│            [Reabrir]  [Apagar]                           │
-│                                                          │
-│  ...                                                     │
-│                                                          │
-│  ─────────────────────────────────────────               │
+│  ── Semana passada ──                                    │
+│   🕒 28/04  Esse seguro é obrigatório?                   │
+│             [ Reabrir ]  [ Apagar ]                      │
 │                                                          │
 │  ⓘ Conversas mais antigas que 30 dias são apagadas       │
-│     automaticamente. (Plano Plus)                        │
+│     automaticamente (plano Tranquilo).                   │
 │                                                          │
-│  [ Apagar todas ]    [ Exportar histórico ]              │
+│  [ Apagar todas ]   [ Exportar histórico ]               │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **Retenção visível.** Usuário sempre sabe quanto tempo as conversas ficam.
-- **"Apagar todas"** é destrutivo, com confirmação dupla.
-- **"Exportar histórico"** baixa em PDF ou JSON estruturado — direito de portabilidade da LGPD.
+- **Retenção visível** — direito da LGPD tratado como feature.
+- **Exportar** (PDF/JSON) = portabilidade.
 
 ---
 
-## Casos de borda
-
-### Pergunta ambígua
+## Modo privacidade (IA desligada)
 
 ```
-Você
-Vale a pena?
-
-IA — Tenor
-
-Vale a pena... o quê especificamente?
-
-Posso te ajudar com algumas perguntas comuns:
- ▸ Vale amortizar R$ X agora?
- ▸ Vale portar pro [outro banco]?
- ▸ Vale usar FGTS desta vez?
- ▸ Vale aumentar aporte mensal pra R$ X?
-```
-
-### Pergunta com dado faltante
-
-```
-Você
-Compare amortizar com investir em renda fixa.
-
-IA — Tenor
-
-Pra comparar com precisão, preciso saber:
-
- 1. Qual valor você está considerando?
-    [    ] R$
-    
- 2. Por quanto tempo ficaria investido?
-    [   ] meses
-
- 3. Você tem reserva de emergência preservada?
-    ⦾ Sim   ⦾ Não   ⦾ Parcial
-
-[Continuar com esses dados]
-```
-
-### Pergunta que requer dados não armazenados
-
-```
-Você
-Considerando minha renda, posso amortizar R$ 10k/mês?
-
-IA — Tenor
-
-Você ainda não declarou sua renda no Tenor.
-Esse dado é opcional — usado só pra avaliações
-de comprometimento.
-
-Quer informar agora?
-[Informar renda] [Pular]
-
-Se preferir, posso te dar a análise técnica sem
-considerar renda: o impacto no contrato seria...
+ⓘ Você desativou a análise por IA. Você ainda pode:
+  ▸ ver quando seu financiamento acaba
+  ▸ conferir o banco
+  ▸ rodar ensaios de adiantamento
+Pra reativar: Configurações → Privacidade.
 ```
 
 ---
 
-## Modo offline (privacidade extrema)
+## Diferenças nicho × massa
 
-Usuário pode desativar IA na config:
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  IA — Tenor                                         │
-│                                                          │
-│  ⓘ Você desativou análise por IA.                        │
-│                                                          │
-│  Para usar este recurso, ative em                        │
-│  Configurações → Privacidade.                            │
-│                                                          │
-│  Enquanto isso, você pode:                               │
-│   ▸ Criar e simular cenários (sem IA)                    │
-│   ▸ Usar stress tests predefinidos                       │
-│   ▸ Ver auditoria do seu contrato                        │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
----
-
-## Diferenças por plano
-
-| Funcionalidade | Básico | Plus | Avançado |
-|---|---|---|---|
-| Perguntas por mês | 10 | Ilimitado | Ilimitado |
-| Memória de conversas | — | 30 dias | 90 dias |
-| Citações com fonte | ✓ | ✓ | ✓ |
-| "Como chegamos nisso?" | ✓ | ✓ | ✓ |
-| Sugestões contextuais | ✓ | ✓ | ✓ |
-| Modo offline (desativar IA) | ✓ | ✓ | ✓ |
-| Export do histórico | ✓ | ✓ | ✓ |
+| | Nicho (Quitador) | Massa (Confuso) |
+|---|---|---|
+| Perguntas-âncora | "Compare meus cenários", "vale portar?" | "Por que subiu?", "esse seguro é obrigatório?" |
+| Papel | Consultor de otimização | Tradutor + guardião |
+| Tom | Técnico, direto | Acolhedor, antijargão |
 
 ---
 
@@ -474,51 +235,7 @@ Usuário pode desativar IA na config:
 
 | Métrica | Meta |
 |---|---|
-| Taxa de uso da IA por usuário ativo | > 30% em 7 dias |
-| Perguntas médias por sessão | 2-4 |
-| Taxa de satisfação (👍/👎) por resposta | > 80% positiva |
-| Taxa de "como chegamos nisso?" | > 15% (sinal saudável de auditoria) |
-| Taxa de pergunta fora de escopo | < 10% |
-
----
-
-## Relação com privacidade
-
-Esta jornada tem o **maior risco de privacidade do produto**, então merece tratamento especial:
-
-### O que é enviado ao LLM
-
-- Saldo, taxas, prazo (números, sem identificação)
-- Pergunta original do usuário (após redaction de PII se houver)
-- Resultados de cálculos do motor determinístico
-- Templates de prompt versionados (auditáveis internamente)
-
-### O que NÃO é enviado
-
-- Nome do usuário
-- CPF (já não está armazenado)
-- Conta, agência, número de contrato bancário
-- E-mail
-- Endereço IP
-- Outros contratos do mesmo usuário
-
-### Provedor
-
-- Anthropic API com Zero Data Retention contratual
-- Prompts não usados para treino
-- Documentado em política pública
-
-### Auditabilidade
-
-- Toda interação fica em log por 30 dias (debug)
-- Logs sem PII (já redacted antes do envio)
-- Usuário pode ver "interações com IA" no Audit (Jornada 7)
-- Usuário pode apagar histórico a qualquer momento
-
-### Modo offline
-
-Quem desativa IA em Privacidade:
-- Nada é enviado externamente
-- Chat fica desabilitado
-- Restante do produto funciona normal (cenários, stress, dashboard, audit)
-- Reativação restaura serviço imediatamente
+| Uso do chat por usuário ativo (7 dias) | > 30% |
+| Perguntas por sessão | 2–4 |
+| Satisfação (👍) por resposta | > 80% |
+| Uso de "como chegamos nisso?" | sinal de confiança |

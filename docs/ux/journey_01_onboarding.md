@@ -1,539 +1,288 @@
-# Tenor — Jornada 1: Onboarding
+# Tenor — Jornada 1: Onboarding (versão massa)
 
-> **Objetivo**: do landing ao primeiro insight em < 90 segundos.
-> **Princípio guia**: o usuário sai do onboarding sentindo que o produto **já entendeu o contrato dele**, não que ele precisa ensinar o produto.
+> **Objetivo**: do "tirei uma foto" ao "agora eu entendo meu financiamento" em menos de 60 segundos — **sem exigir que a pessoa saiba ler o próprio contrato**.
+> **Princípio guia**: o usuário sai do onboarding sentindo que o produto **já entendeu o financiamento dele** e que pode confiar — não que ele precisa ensinar o produto nem provar que entende de finanças.
+>
+> Esta é a porta de entrada do público de **massa** (perfil "Confuso/Ansioso"). A versão de nicho (DDC + leitura de contrato) continua válida como fluxo avançado.
 
 ---
 
 ## Arco emocional
 
 ```
-Curiosidade → Cautela → Pequeno esforço → Reconhecimento → Confiança
-   landing      auth       upload          extração         primeiro insight
+Desconfiança → Esforço mínimo → Reconhecimento → "Como ele sabe disso?" → Confiança
+   landing        foto/3 campos     primeiro insight    tradução             próximo passo
 ```
 
-Cada tela é uma micro-transação de confiança. O usuário dá um pouco de informação; o produto devolve algo concreto antes de pedir o próximo pedaço.
+A massa chega desconfiada ("mais um app que quer meus dados") e sem vocabulário financeiro. Cada tela é uma micro-transação de confiança: o usuário dá o mínimo, o produto devolve clareza concreta antes de pedir o próximo pedaço. **Pedir cadastro só depois do primeiro insight.**
 
 ---
 
-## Tela 0.1 — Landing page (não autenticada)
+## Modelo mental do usuário (massa)
 
-> Implementada em `web/src/routes/index.tsx`
-> Inspiração de layout e copy: enzonotes.com — padrão de negação direta para privacidade
+> "Eu pago todo mês e não sei direito o que é aquilo. Acho que tem uns seguros que nunca pedi. Será que dá pra entender isso sem precisar ligar pro gerente — e sem dar de bandeja meus dados pro banco?"
 
-```
-┌──────────────────────────────────────────────────────────┐
-│  Tenor                              [Entrar →]      │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│              Financiamento imobiliário                   │  ← label âmbar, caps
-│                                                          │
-│         Cada parcela tem um plano.                       │  ← serifa grande
-│         Cada plano tem um fim.                           │  ← muted
-│                                                          │
-│    Tenor é o cofre privado do seu                   │
-│    financiamento. Você guarda seu contrato,              │
-│    simula cenários e sabe quando quita.                  │
-│                                                          │
-│         [ Começar — é grátis ]                           │
-│                                                          │
-│   ●————●————●·············○                              │  ← timeline CSS
-│  dez  hoje  marco zero   2042                            │  ← âmbar, gain, tachado
-│                                                          │
-│    De 2042 para 2029 — com disciplina e as decisões      │
-│                                                          │
-│                                                          │
-│  ────────── Como funciona ───────────────────────────    │
-│                                                          │
-│  01  Você guarda seu contrato                            │
-│      Suba o PDF do DDC ou preencha manualmente.          │
-│                                                          │
-│  02  Tenor entende a matemática                     │
-│      Motor SAC/PRICE calcula cenários em tempo real.     │
-│                                                          │
-│  03  Você age no momento certo                           │
-│      Coach alerta FGTS, Selic, desvios do plano.         │
-│                                                          │
-│                                                          │
-│  ────────── Seus dados são seus ─────────────────────    │
-│                                                          │
-│  ┌────────────────────────────────────────────────┐      │
-│  │ Não.  Não vendemos seus dados para bancos.     │      │  ← "Não." em vermelho
-│  ├────────────────────────────────────────────────┤      │
-│  │ Não.  Não usamos seu contrato para treinar IA. │      │
-│  ├────────────────────────────────────────────────┤      │
-│  │ Não.  Não armazenamos seu CPF.                 │      │
-│  ├────────────────────────────────────────────────┤      │
-│  │ Sim.  Você exporta e apaga tudo, 2 cliques.    │      │  ← "Sim." em verde
-│  ├────────────────────────────────────────────────┤      │
-│  │ Sim.  Cálculos rodam no servidor, não na IA.   │      │
-│  └────────────────────────────────────────────────┘      │
-│                                                          │
-│  Política de privacidade em menos de 1.500 palavras.     │
-│                                                          │
-│                                                          │
-│  ────────────────────────────────────────────────────    │
-│                                                          │
-│         Quando você quita?                               │
-│                                                          │
-│    Calcule em 90 segundos. Sem cartão, sem compromisso.  │
-│                                                          │
-│         [ Ver meu plano de quitação ]                    │
-│                                                          │
-│  ────────────────────────────────────────────────────    │
-│  Tenor          Conformidade LGPD · Dados no Brasil │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Decisões
-
-- **Tagline em dois tons**: primeira linha em foreground (peso), segunda em muted (eco). Cria ritmo sem usar duas fontes diferentes.
-- **Timeline CSS** no hero: visual único e on-brand que comunica a promessa ("de 2042 para 2029") sem precisar de imagem.
-- **Seção "Seus dados são seus"** com padrão de negação direta (inspirado em enzonotes.com): cada item começa com "Não." ou "Sim." em serif colorido. Escaneável em 10 segundos. Sem juridiquês.
-- **Label âmbar no topo** ("Financiamento imobiliário"): ancora o contexto antes do hero. Evita confusão sobre o que o produto é.
-- **CTA único**: "Começar — é grátis". CTA final reframed: "Ver meu plano de quitação" — mais específico que "Começar", diminui fricção por prometer uma resposta concreta.
-- **Sem social proof inventado**. Sem ícones decorativos. Sem gradientes.
+O usuário não quer otimizar. Quer **entender** e **se sentir seguro**. A linguagem é tudo: nada de "amortização do principal", "sistema de amortização", "saldo devedor atualizado". Em vez disso: "abate a dívida", "quanto ainda falta", "quando acaba".
 
 ---
 
-## Tela 0.2 — Autenticação
+## Princípios duros
+
+1. **Foto é o caminho padrão.** Digitar é o fallback, não o contrário.
+2. **Clareza antes de cadastro.** O primeiro insight aparece antes de pedir e-mail.
+3. **Tolerância à ignorância.** Aceita dados parciais; pede o resto depois; nunca pune erro de digitação.
+4. **Tradução desde o primeiro número.** Todo valor vem com explicação em português.
+5. **Confiança explícita.** Sem integração bancária, sem venda de dados, exclusão a um toque — dito na cara, cedo.
+
+---
+
+## Tela 1.1 — Landing (não autenticada)
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  ← Voltar                                                │
+│  Tenor                                                   │
 │                                                          │
 │                                                          │
-│        Crie sua conta                                    │
+│       Entenda seu financiamento.                         │
+│       Saiba quando acaba.                                │
+│       Veja se o banco está certo.                        │
 │                                                          │
-│        E-mail                                            │
-│        ┌────────────────────────────────────────┐        │
-│        │ thiago@…                               │        │
-│        └────────────────────────────────────────┘        │
+│       Tire uma foto do seu boleto. Em 30 segundos        │
+│       a gente te mostra o que você está pagando —        │
+│       e quando você se livra disso.                      │
 │                                                          │
-│        ┌────────────────────────────────────────┐        │
-│        │  Receber link de acesso                │        │
-│        └────────────────────────────────────────┘        │
+│       ┌────────────────────────────┐                     │
+│       │   Começar com uma foto      │                    │
+│       └────────────────────────────┘                     │
 │                                                          │
-│        ─── ou ───                                        │
+│       Não tenho o boleto agora → começar pelos números   │
+│       Já tenho conta? Entrar                              │
 │                                                          │
-│        Continuar com Google                              │
-│        Continuar com Apple                               │
+│  ── Por que confiar ──────────────────────────────────   │
 │                                                          │
-│                                                          │
-│        ☐ Li e aceito termos de uso e política de         │
-│          privacidade. [ler — 1500 palavras]              │
-│                                                          │
-│                                                          │
+│  • Seus dados são só seus. Sem integração bancária.      │
+│  • A gente não vende seus dados pra banco nenhum.        │
+│  • Você pode apagar tudo a qualquer momento.             │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **Magic link como default**. Sem senha pra vazar, sem senha pra esquecer. Mais seguro e mais rápido.
-- **OAuth como conveniência**, não como única opção. Quem não quer Google/Apple tem caminho próprio.
-- **Checkbox NÃO pré-marcado**. Usuário marca ativamente. Link "ler" abre a política em modal lateral, não em nova aba — ele não perde contexto.
-- **Sem opt-in de marketing aqui**. Será oferecido depois, com contexto.
-- **Sem CAPTCHA visível**. Rate limiting silencioso no servidor. CAPTCHA só aparece se houver sinal claro de ataque.
+- **Headline troca otimização por clareza/proteção** — fala com quem nunca entendeu o boleto.
+- **CTA de foto em primeiro lugar**; o "pelos números" é discreto.
+- **Bloco de confiança no fold inicial.** Para a massa, a barreira não é interesse — é desconfiança.
 
 ---
 
-## Tela 0.3 — Boas-vindas (após primeiro login)
+## Tela 1.2 — Captura por foto
 
 ```
 ┌──────────────────────────────────────────────────────────┐
+│  ←  Vamos ler seu boleto                                 │
 │                                                          │
+│   ┌────────────────────────────────────────────┐         │
+│   │                                              │        │
+│   │            📷  Tirar foto                    │        │
+│   │       do boleto ou do demonstrativo          │        │
+│   │                                              │        │
+│   └────────────────────────────────────────────┘         │
 │                                                          │
-│              Olá, Thiago.                                │
+│   [  🖼  Escolher da galeria  ]                          │
 │                                                          │
-│              Vamos guardar seu                           │
-│              primeiro contrato.                          │
+│   Pode ser o boleto do mês ou o demonstrativo anual      │
+│   (DDC). Quanto mais completo, melhor a leitura.         │
 │                                                          │
-│              ─────────────                               │
+│   Prefere digitar? São só 3 campos →                     │
 │                                                          │
-│              Em 90 segundos você verá                    │
-│              quando termina de pagar.                    │
-│                                                          │
-│                                                          │
-│              ┌──────────────┐                            │
-│              │  Começar     │                            │
-│              └──────────────┘                            │
-│                                                          │
-│                                                          │
-│              Pular agora                                 │
-│              Você pode adicionar depois.                 │
-│                                                          │
+│   ⓘ A imagem é processada só pra extrair os números.     │
+│      A gente não guarda seu nome nem seu CPF.            │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **"Olá, [nome]"** se conseguiu o nome via OAuth. Senão, "Olá." apenas — não inventa.
-- **Promessa concreta** ("90 segundos", "quando termina de pagar"). Cria expectativa que o produto cumpre.
-- **"Pular agora"** é discreto mas presente. Sem cor de alerta, sem culpa.
-- **Sem barra de progresso ainda.** Aparece a partir da próxima tela, quando o usuário já optou por começar.
+- **Extração assistida por IA** (modelo barato/Haiku) lê os campos; o usuário **confirma** antes de salvar (tela 1.3.1).
+- **Aviso de privacidade no ponto de fricção** — exatamente onde o usuário hesita em mandar um documento.
 
 ---
 
-## Tela 0.4 — Seleção de banco
+## Tela 1.2.1 — Conferência da leitura (depois da foto)
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  ●○○○○                                                   │
+│  ←  Confere se eu li certo                               │
 │                                                          │
-│  Onde está seu contrato?                                 │
+│  Li isso do seu boleto. Ajuste o que estiver errado:     │
 │                                                          │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐                   │
-│  │         │  │         │  │         │                   │
-│  │  Caixa  │  │  Itaú   │  │   BB    │                   │
-│  │         │  │         │  │         │                   │
-│  └─────────┘  └─────────┘  └─────────┘                   │
+│  Saldo que ainda falta     [ R$ 429.629,87 ]             │
+│  Parcela                   [ R$   1.247,00 ]             │
+│  Parcelas restantes        [ 189 ] meses                 │
+│  Tipo                      [ SAC ▾ ]   (achei no boleto) │
 │                                                          │
-│  ┌─────────┐  ┌─────────┐  ┌─────────┐                   │
-│  │         │  │         │  │         │                   │
-│  │Bradesco │  │Santander│  │  Outro  │                   │
-│  │         │  │         │  │         │                   │
-│  └─────────┘  └─────────┘  └─────────┘                   │
+│  Não achei: taxa de juros — posso estimar pelos números  │
+│  acima, ou você informa se souber.  [ Estimar ]          │
 │                                                          │
-│                                                          │
-│  ⓘ Suporte completo para os 5 maiores bancos.           │
-│     Outros bancos: entrada manual.                       │
-│                                                          │
-│  ← Voltar                                                │
+│  [  Está certo, continuar  ]                             │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **Cards visuais com logo** (não só texto). Reconhecimento é mais rápido que leitura.
-- **Click no banco já avança.** Sem botão "próximo". 1 click a menos.
-- **Caveat sobre cobertura visível.** Honestidade gera confiança.
-- **"Outro" não é desclassificado.** Tem o mesmo peso visual dos outros — entrada manual é caminho legítimo.
+- **Humano no controle da extração.** A IA propõe, o usuário confirma. Reduz erro e aumenta confiança.
+- **Campo faltante não trava o fluxo** — o produto estima e segue.
 
 ---
 
-## Tela 0.5 — Decisão: PDF ou manual
+## Tela 1.3 — Fallback de 3 campos
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  ●●○○○                                                   │
+│  ←  Só preciso de 3 números                              │
 │                                                          │
-│  Você tem o DDC do Itaú em PDF?                          │
+│  Você acha todos no app do seu banco, na tela do         │
+│  financiamento. Não precisa acertar de primeira.         │
 │                                                          │
-│  O DDC (Demonstrativo Descritivo de Crédito) tem todo    │
-│  o histórico do seu contrato — parcelas, operações,      │
-│  saldo. É o documento mais completo.                     │
+│  Saldo devedor hoje          [  R$            ]          │
+│    quanto ainda falta pagar                              │
 │                                                          │
-│  📎 Como pegar no app do Itaú? [tutorial]                │
+│  Valor da parcela            [  R$            ]          │
 │                                                          │
+│  Parcelas que faltam         [        ] meses            │
 │                                                          │
-│  ┌─────────────────────────┐  ┌─────────────────────────┐│
-│  │                         │  │                         ││
-│  │   Tenho o PDF           │  │   Não tenho             ││
-│  │   Vou enviar            │  │   Quero entrar          ││
-│  │                         │  │   manualmente           ││
-│  │   Recomendado           │  │                         ││
-│  │   ~30 segundos          │  │   ~2 minutos            ││
-│  │                         │  │                         ││
-│  └─────────────────────────┘  └─────────────────────────┘│
+│  Não sei algum desses → me ajuda a achar                 │
 │                                                          │
-│  ← Voltar                                                │
+│  [  Ver meu financiamento  ]                             │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Tela 1.3.1 — "Me ajuda a achar"
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  ←  Onde achar cada número                               │
+│                                                          │
+│  Saldo devedor                                           │
+│   No app do banco → Financiamentos → seu contrato.       │
+│   Pode aparecer como "saldo devedor" ou "saldo atual".   │
+│                                                          │
+│  Valor da parcela                                        │
+│   É o valor do boleto do mês.                            │
+│                                                          │
+│  Parcelas que faltam                                     │
+│   Costuma aparecer como "prazo restante" ou              │
+│   "parcelas a vencer".                                   │
+│                                                          │
+│  [ Entendi, voltar ]                                     │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **Educa sem ser professoral.** Uma frase explica o termo "DDC".
-- **Tutorial é link, não modal.** Quem precisa, abre. Quem não, segue.
-- **Tempo estimado em cada caminho.** Tira dúvida ("quanto isso vai me tomar?").
-- **"Recomendado" é badge sutil**, não imposição. Alguns usuários genuinamente não têm o DDC.
+- **Três campos, não dez.** A massa abandona formulário longo.
+- **Ajuda contextual** reduz o abandono de quem não sabe onde achar o dado.
 
 ---
 
-## Tela 0.6a — Upload do DDC (caminho com PDF)
+## Tela 1.4 — Primeiro insight (o "reconhecimento")
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  ●●●○○                                                   │
+│  Pronto. Aqui está o seu financiamento.                  │
 │                                                          │
-│  Suba o DDC do Itaú                                      │
+│        Você se livra disso em                            │
+│            ┌─────────────────┐                           │
+│            │   Março / 2042   │   faltam 15 anos e 9 m   │
+│            └─────────────────┘                           │
 │                                                          │
-│  ┌──────────────────────────────────────────────┐        │
-│  │                                              │        │
-│  │                                              │        │
-│  │              📄                              │        │
-│  │                                              │        │
-│  │     Arraste o PDF aqui                       │        │
-│  │     ou clique para escolher                  │        │
-│  │                                              │        │
-│  │                                              │        │
-│  └──────────────────────────────────────────────┘        │
+│  Da sua parcela de R$ 1.247, hoje:                       │
+│   ▓▓▓▓▓▓▓▓▓▓▓▓░░░░  R$ 812  são juros                    │
+│   ▓▓▓░░░░░░░░░░░░░  R$ 341  abatem a dívida              │
+│   ░░░░░░░░░░░░░░░░  R$  94  são seguros (MIP + DFI)       │
 │                                                          │
+│  ⓘ "Por que tão pouco abate a dívida?" → toque pra      │
+│     eu te explicar.                                      │
 │                                                          │
-│  🔒 Seu PDF entra direto no seu cofre privado.           │
-│     CPF é detectado e removido antes de armazenar.       │
-│     [Saiba como]                                         │
+│  ── E agora? ──────────────────────────────────────      │
+│  [  Conferir se o banco está certo  ]                    │
+│  [  Ver o que muda se eu adiantar um pouco  ]            │
 │                                                          │
-│  ← Voltar                                                │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Estado durante o processamento
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  ●●●○○                                                   │
-│                                                          │
-│  📄 DDC_05052026.pdf                                     │
-│                                                          │
-│  ✓ CPF detectado e removido                              │
-│  ✓ Banco identificado: Itaú                              │
-│  ✓ Saldo extraído: R$ 429.629,87                         │
-│  ✓ 189 parcelas mapeadas                                 │
-│  ✓ 6 operações históricas                                │
-│  ◐ Validando consistência…                               │
-│                                                          │
+│  Quer guardar isso? [ Criar conta grátis ]               │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **Cada checkmark é um momento de confiança.** Aparecem em sequência (~200-400ms entre eles), não tudo de uma vez. Cria ritmo.
-- **CPF redaction é o primeiro check** — antes de qualquer outra extração. Comunica prioridade de privacidade.
-- **Validação semântica é etapa visível.** Se o saldo estiver fora de range razoável, aparece em amarelo, não verde.
-- **Em caso de erro de parser**, queda graciosa: "Não conseguimos extrair tudo automaticamente. Vamos pedir alguns dados."
+- **A data de quitação é o herói.** É a resposta que a massa mais quer.
+- **A quebra da parcela é o "aha".** Ver que R$ 812 de R$ 1.247 são juros é chocante e engaja.
+- **Cadastro só agora**, enquadrado como "guardar" — o valor já foi entregue.
+- **Duas âncoras plantadas:** guardião (conferir o banco) e adiantamento pequeno.
 
 ---
 
-## Tela 0.6b — Entrada manual (caminho sem PDF)
+## Tela 1.5 — Criar conta (mínimo atrito)
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  ●●●○○                                                   │
+│  ←  Criar conta grátis                                   │
 │                                                          │
-│  Vamos preencher o essencial                             │
-│  Você consulta no app do banco.                          │
+│  Pra guardar seu financiamento e conferir o banco        │
+│  sempre que quiser.                                      │
 │                                                          │
-│  ─── Sobre seu contrato ───────────────────────          │
+│  E-mail            [                          ]          │
+│  Senha             [                          ]          │
 │                                                          │
-│  Saldo devedor atual                                     │
-│  ┌──────────────────────┐                                │
-│  │ R$                   │                                │
-│  └──────────────────────┘                                │
+│  [  Criar conta  ]                                       │
 │                                                          │
-│  Taxa de juros mensal                                    │
-│  ┌──────────────────────┐                                │
-│  │            %         │      ⓘ Geralmente entre        │
-│  │                      │        0,7% e 1,1%             │
-│  └──────────────────────┘                                │
+│  Ao criar, você aceita os Termos e a Política de         │
+│  Privacidade. [ler]                                      │
 │                                                          │
-│  Sistema de amortização                                  │
-│  ⦿ SAC    ⦾ Price                                        │
-│                                                          │
-│  ─── Sobre as parcelas ────────────────────────          │
-│                                                          │
-│  Parcelas restantes                                      │
-│  ┌──────────────────────┐                                │
-│  │                      │                                │
-│  └──────────────────────┘                                │
-│                                                          │
-│  Valor da próxima parcela                                │
-│  ┌──────────────────────┐                                │
-│  │ R$                   │                                │
-│  └──────────────────────┘                                │
-│                                                          │
-│  Vencimento da próxima parcela                           │
-│  ┌──────────────────────┐                                │
-│  │ DD / MM / AAAA       │                                │
-│  └──────────────────────┘                                │
-│                                                          │
-│  ─── Apelido (opcional) ───────────────────────          │
-│                                                          │
-│  Como chamar este contrato?                              │
-│  ┌──────────────────────────────────┐                    │
-│  │ Apartamento Contagem             │                    │
-│  └──────────────────────────────────┘                    │
-│                                                          │
-│  ┌──────────────────────────┐                            │
-│  │  Continuar               │                            │
-│  └──────────────────────────┘                            │
-│                                                          │
-│  ← Voltar                                                │
+│  ⓘ A análise por IA é opcional e você liga/desliga       │
+│     quando quiser, nas configurações.                    │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **Tudo em uma única tela com scroll.** Steps fragmentados criam fricção desnecessária.
-- **Hints contextuais** ao lado de campos confusos. "Geralmente entre 0,7% e 1,1%" tira a dúvida do usuário inseguro.
-- **Validação inline.** Se o usuário coloca taxa de 5% (irreal), aparece alerta amarelo: "Taxa fora do esperado. Confirma?"
-- **Apelido opcional**, mas útil — usuário pode ter mais contratos no futuro.
-
----
-
-## Tela 0.7 — Conferência
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  ●●●●○                                                   │
-│                                                          │
-│  Confere o que vamos guardar:                            │
-│                                                          │
-│  Apelido           Apartamento Contagem                  │
-│  Banco             Itaú                                  │
-│  Contrato          10300539502                           │
-│                                                          │
-│  Saldo devedor     R$ 429.629,87                         │
-│  Taxa              0,9631% a.m. (12,19% a.a.)            │
-│  Sistema           SAC                                   │
-│                                                          │
-│  Parcelas restantes      189                             │
-│  Próxima parcela         R$ 6.578,27                     │
-│  Vencimento              21/05/2026                      │
-│  Última parcela          21/01/2042                      │
-│                                                          │
-│  ─────────────────────────────────────                   │
-│                                                          │
-│  ⓘ Algum valor errado? Edite antes de salvar.            │
-│                                                          │
-│  [ Editar valores ]    [ Tudo certo, guardar ]           │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Decisões
-
-- **Confirmação explícita é etapa**, não ato passivo. Persistir só após confirmar.
-- **Editar valores** volta para a tela 0.6 (manual) ou abre editor inline (caso PDF).
-- **"Tudo certo, guardar"** é o CTA principal — mais largo, mais escuro.
-
----
-
-## Tela 0.8 — Primeiro insight
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  ●●●●●                                                   │
-│                                                          │
-│                                                          │
-│        Pronto, Thiago.                                   │
-│                                                          │
-│        Olha o que descobrimos:                           │
-│                                                          │
-│                                                          │
-│        ●  Você quita em 21/01/2042                       │
-│                                                          │
-│        ●  Sua taxa (12,19% a.a.) está                    │
-│           ~60bps acima da média de mercado em 2026       │
-│                                                          │
-│        ●  6 amortizações em 5 meses —                    │
-│           padrão raro de disciplina                      │
-│                                                          │
-│                                                          │
-│        ┌──────────────────────────┐                      │
-│        │  Ver meu painel          │                      │
-│        └──────────────────────────┘                      │
-│                                                          │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Decisões
-
-- **3 insights, sempre.** Mais que isso vira ruído; menos parece superficial.
-- **Cada insight é específico ao contrato real.** Não pode ser genérico ("Você tem um financiamento") — perde o efeito de "eles já me entenderam".
-- **Tom factual, não bajulador.** "Padrão raro de disciplina" é elogio honesto, não puxa-saco.
-- **Insights variam.** Se o usuário não fez amortizações, o terceiro insight é diferente — talvez "Quitando como hoje, você paga R$ 391k em juros adicionais. Veja como reduzir."
-
----
-
-## O que acontece se o usuário pula
-
-Se em qualquer ponto após a Tela 0.3 ele clica "pular agora":
-
-```
-┌──────────────────────────────────────────────────────────┐
-│                                                          │
-│                                                          │
-│        Tudo bem.                                         │
-│                                                          │
-│        Seu cofre está pronto e vazio.                    │
-│        Você pode adicionar contratos a qualquer          │
-│        momento, sem perder nada.                         │
-│                                                          │
-│        ┌──────────────────────────┐                      │
-│        │  Ir para o painel        │                      │
-│        └──────────────────────────┘                      │
-│                                                          │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-E o dashboard recebe o usuário com estado vazio (não vazio-vazio — vazio-acolhedor):
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  Tenor                          [perfil] [⚙]        │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│        Seu cofre está pronto.                            │
-│                                                          │
-│        Adicione seu primeiro contrato para               │
-│        começar a usar.                                   │
-│                                                          │
-│        ┌──────────────────────────┐                      │
-│        │  Adicionar contrato      │                      │
-│        └──────────────────────────┘                      │
-│                                                          │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
+- **E-mail + senha** (magic link como opção). Sem pedir nome/CPF — coerente com a promessa de privacidade.
+- **Consentimento de IA é opt-in explícito**, não pré-marcado.
 
 ---
 
 ## Casos de borda
 
-### Usuário sobe PDF que não é DDC
-
+### Foto ilegível
 ```
-⚠ Não conseguimos identificar este PDF como um DDC.
-
-   Pode ser:
-   • Um extrato (não tem todas as parcelas)
-   • Um boleto de parcela
-   • Outro documento bancário
-
-   Você quer:
-   [Tentar outro PDF]    [Entrar manualmente]
+Não consegui ler direito essa imagem.
+Tenta de novo com mais luz e o boleto reto — ou
+me passa os 3 números na mão.  [ Tentar foto ]  [ Digitar ]
 ```
 
-### Parser detecta valores fora de range
-
+### Financiamento quase quitado
 ```
-⚠ Algo parece estranho.
-
-   Encontramos taxa mensal de 4,5% — bem acima do
-   normal (0,7% a 1,1%). Pode ser que:
-   • O parser leu errado
-   • É um financiamento de outro tipo (não imobiliário)
-
-   [Editar manualmente]    [Está correto, prosseguir]
+Boa notícia: falta pouco! Você se livra disso em
+Nov/2026 — daqui a 6 meses. Quer conferir se o
+saldo final que o banco vai cobrar está certo?
 ```
 
-### Usuário abandona no meio (volta depois)
-
-Tenor salva o progresso na tela 0.4 em diante. Voltar abre direto na última tela alcançada, com mensagem leve no topo:
-
+### Múltiplos contratos
 ```
-ⓘ Você estava cadastrando seu Itaú. Vamos continuar?
-   [Continuar de onde parei]    [Recomeçar]
+Vi que você tem mais de um financiamento nesse
+demonstrativo. Quer cadastrar os dois? Você troca
+entre eles lá em cima, no nome do imóvel.
+[ Cadastrar os dois ]   [ Só este por enquanto ]
 ```
+
+---
+
+## Diferenças nicho × massa
+
+| | Nicho (Quitador) | Massa (Confuso) |
+|---|---|---|
+| Entrada | DDC, leitura de contrato | Foto do boleto / 3 campos |
+| Primeiro valor entregue | Cenário de quitação | "Quando acaba" + quebra da parcela |
+| Linguagem | Técnica (SAC, amortização) | Tradução ("abate a dívida") |
+| Pedido de cadastro | Cedo (já está convencido) | Só após o primeiro insight |
 
 ---
 
@@ -541,21 +290,7 @@ Tenor salva o progresso na tela 0.4 em diante. Voltar abre direto na última tel
 
 | Métrica | Meta |
 |---|---|
-| Tempo médio do landing ao primeiro insight | < 90s |
-| Taxa de conclusão do onboarding | > 70% |
-| Taxa de pular o onboarding | < 15% |
-| Erros de parser que caem em manual | < 10% |
-| Taxa de retorno em 7 dias | > 50% |
-
----
-
-## Relação com privacidade
-
-Pontos do onboarding onde a privacidade é tornada visível:
-
-- **Tela 0.1**: "🔒 Seus dados ficam no seu cofre" — mensagem clara.
-- **Tela 0.2**: checkbox de termos NÃO pré-marcado. Sem opt-in de marketing.
-- **Tela 0.6a**: "✓ CPF detectado e removido" — primeiro check, antes de tudo.
-- **Tela 0.6a**: "🔒 Seu PDF entra direto no seu cofre privado" — repete mensagem.
-
-A privacidade aparece em **3 momentos** do onboarding, sem virar palestra. Quem repara, repara. Quem não, ainda absorve subliminarmente.
+| Conclusão do onboarding (landing → primeiro insight) | > 60% |
+| Uso da foto vs digitação | acompanhar; foto deve dominar |
+| Cadastro após o primeiro insight | > 35% |
+| Tempo até o primeiro insight | < 60 s |

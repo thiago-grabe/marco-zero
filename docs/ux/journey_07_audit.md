@@ -1,588 +1,225 @@
-# Tenor — Jornada 7: Audit
+# Tenor — Jornada 7: Audit / Guardião (versão massa)
 
-> **Objetivo**: provar que a matemática bate, e dar ao usuário transparência total sobre o que aconteceu.
-> **Princípio guia**: audit é a feature **menos sexy e mais defensável** do produto. É o que separa Tenor de qualquer simulador.
+> **Objetivo**: provar que a matemática bate e dar ao usuário a sensação de ter **alguém do lado dele conferindo o banco**.
+> **Princípio guia**: para o nicho, audit é a feature menos sexy e mais defensável. Para a **massa, é o valor emocional principal** — o motivo de confiar. Reposicionar de "auditoria técnica" para **"Conferindo o banco"**.
 
 ---
 
-## Modelo mental do usuário
+## Modelo mental do usuário (massa)
 
-> "Quero ver tudo o que aconteceu, em ordem, sem mistério. Quero poder discutir com o gerente do banco com dado na mão."
+> "Será que o banco está me cobrando certo? Eu não tenho como saber sozinho. Se tivesse alguém conferindo isso pra mim e me avisando se algo estivesse errado, eu dormiria mais tranquilo."
 
-Audit é a feature que a maioria dos usuários **nunca abre**. Mas saber que ela existe é o que gera confiança. E os 10% de power users que abrem viram fãs do produto pela vida inteira.
+A massa não quer auditar — quer **ser protegida**. A feature precisa fazer o trabalho e comunicar proteção, não exigir que o usuário entenda a memória de cálculo.
 
 ---
 
 ## Princípios duros
 
-1. **Tudo é registrado.** Cada DDC importado, cada amortização declarada, cada cenário criado, cada interação com IA, cada acesso à conta.
-2. **Nada é apagado por padrão.** Histórico é imutável dentro do prazo de retenção. Edição preserva versão anterior.
-3. **Reconciliação automática.** Tenor compara o que esperava com o que o banco registra. Diferenças são sinalizadas, não escondidas.
-4. **Tudo exportável.** Linha do tempo, reconciliação, logs — em PDF e CSV.
-5. **Zero adornos.** Tom técnico-frio. Audit não tenta ser bonito — tenta ser inquestionável.
+1. **Linguagem de proteção, não de auditoria.** "Conferindo o banco", não "Reconciliação".
+2. **Conferência automática.** O produto compara sozinho; o usuário não precisa pedir.
+3. **Divergência é o momento-ouro.** Explica em português, sem alarmar, e dá ação concreta.
+4. **Usuário sempre no controle.** O Tenor nunca envia nada ao banco no lugar dele.
+5. **Privacidade é parte do guardião.** "Não mandamos seu nome pra IA, não vendemos pra banco."
 
 ---
 
-## Tela 7.1 — Audit (visão principal)
+## Tela 7.1 — Conferindo o banco (tudo certo)
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  Apartamento Contagem ▾                                  │
-├──────────────────────────────────────────────────────────┤
+│  ←  Conferindo o banco                                   │
 │                                                          │
-│  Audit                                                   │
+│  Última conferência: 05/05/2026                          │
+│  Resultado: ✓ Está tudo certo                            │
 │                                                          │
-│  Tudo o que aconteceu com este contrato.                 │
+│  O que o banco diz que você deve   R$ 429.629,87         │
+│  O que a nossa conta diz            R$ 429.629,87         │
+│  Diferença                          R$ 0,00  ✓           │
 │                                                          │
-│  ─── Seções ───────────────────────────────────          │
+│  Como chegamos nesse número:                             │
+│   Saldo após a parcela de abril     R$ 510.977,65        │
+│   + juros e correção do mês         R$    937,24         │
+│   − sua amortização de R$ 80.000    R$ 80.000,00         │
+│   − parcela de maio                 R$  2.285,02         │
+│   = saldo de hoje                   R$ 429.629,87 ✓      │
 │                                                          │
-│  ▼ Linha do tempo (24 eventos)                           │
-│  ▸ Reconciliação                                         │
-│  ▸ DDCs guardados (3 versões)                            │
-│  ▸ Cenários (3 ativos, 2 arquivados)                     │
-│  ▸ Acessos à conta (12 nos últimos 30 dias)              │
-│  ▸ Interações com IA (8 nos últimos 30 dias)             │
-│                                                          │
-│  ─── Linha do tempo ───────────────────────────          │
-│                                                          │
-│  ┌──────────────────────────────────────────────┐        │
-│  │ 05/05/2026 — DDC importado (v3)              │        │
-│  │ Saldo: R$ 429.629,87                         │        │
-│  │ Diff vs esperado: R$ 0,00 ✓                  │        │
-│  │ [Ver DDC]  [Ver diff vs v2]                  │        │
-│  └──────────────────────────────────────────────┘        │
-│                                                          │
-│  ┌──────────────────────────────────────────────┐        │
-│  │ 28/04/2026 — Amortização R$ 80.000           │        │
-│  │ Modalidade: Redução de prazo                 │        │
-│  │ Juros pró-rata: R$ 178,73                    │        │
-│  │ Atualização monetária: R$ 31,35              │        │
-│  │ Total desembolsado: R$ 80.210,08             │        │
-│  │ [Comprovante]                                │        │
-│  └──────────────────────────────────────────────┘        │
-│                                                          │
-│  ┌──────────────────────────────────────────────┐        │
-│  │ 21/04/2026 — Parcela #4 paga                 │        │
-│  │ Valor: R$ 6.594,12                           │        │
-│  │ Detalhamento:                                │        │
-│  │   amort 1.511,77 + juros 4.935,99            │        │
-│  │   + MIP 107,82 + DFI 38,54                   │        │
-│  │ Saldo após: R$ 510.977,65                    │        │
-│  └──────────────────────────────────────────────┘        │
-│                                                          │
-│  ┌──────────────────────────────────────────────┐        │
-│  │ 25/03/2026 — Amortização R$ 5.000            │        │
-│  │ Modalidade: Redução de prazo                 │        │
-│  │ Juros pró-rata: R$ 6,18                      │        │
-│  └──────────────────────────────────────────────┘        │
-│                                                          │
-│  [ Mostrar mais ]                                        │
-│                                                          │
-│  ...                                                     │
-│                                                          │
-│  ┌──────────────────────────────────────────────┐        │
-│  │ 03/12/2025 — Contrato implantado             │        │
-│  │ Valor original: R$ 536.000,00                │        │
-│  │ Prazo original: 360 meses (até 12/2055)      │        │
-│  │ Sistema: SAC                                  │        │
-│  │ Taxa: 12,19% a.a.                            │        │
-│  └──────────────────────────────────────────────┘        │
-│                                                          │
-│  [ Exportar linha do tempo (PDF / CSV) ]                 │
+│  [ Conferir de novo ]   [ Salvar essa conta em PDF ]     │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **Seções colapsáveis.** Tudo cabe numa tela. Usuário expande o que interessa.
-- **Linha do tempo cronológica reversa.** Mais recente no topo.
-- **Cada evento é card uniforme.** Tipo + data + dados + ações.
-- **Exportação no rodapé.** PDF para humano, CSV para Excel/dashboards.
+- **Selo "está tudo certo"** é o produto entregando tranquilidade.
+- **Memória de cálculo disponível, não obrigatória.** Quem quiser, vê; quem não, confia no selo.
 
 ---
 
-## Tela 7.2 — Reconciliação
-
-A feature **única** de Tenor. Compara o esperado com o real e mostra a matemática.
+## Tela 7.2 — Quando há divergência (o momento de maior valor)
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  ←  Reconciliação                                        │
+│  ←  Conferindo o banco                                   │
 │                                                          │
-│  Comparando o que o Tenor calcula com o que         │
-│  o banco declara.                                        │
+│  ⚠ Achei uma diferença de R$ 1.234,56                    │
 │                                                          │
-│  Última verificação: 05/05/2026                          │
-│  Status: ✓ Tudo bate                                     │
+│  O banco está cobrando mais do que a nossa conta         │
+│  esperava. Antes de assustar, as causas mais comuns:     │
 │                                                          │
-│  ─── Saldo atual ───────────────────────────────         │
+│   1. A TR do mês veio diferente da projetada             │
+│      (diferenças de R$ 400 a R$ 1.300 são normais)       │
+│   2. Alguma operação que você fez e não registrou aqui   │
+│   3. Erro do banco (raro, mas acontece)                  │
 │                                                          │
-│  Saldo esperado (Tenor)    R$ 429.629,87            │
-│  Saldo declarado (DDC Itaú)     R$ 429.629,87            │
-│  Diferença                      R$ 0,00 ✓                │
-│                                                          │
-│  ─── Memória de cálculo ───────────────────────          │
-│                                                          │
-│  Como Tenor chegou em R$ 429.629,87:                │
-│                                                          │
-│  Saldo após parcela #4 (DDC 26/04)    R$ 510.977,65     │
-│  + Juros pró-rata 21/04 a 28/04        R$    178,73     │
-│  + Atualização monetária 21/04 a 28/04 R$     31,35     │
-│  − Amortização extra 28/04             R$ 80.000,00     │
-│  ─────────────────────────────────────                   │
-│  = Saldo após operação                 R$ 431.187,73     │
-│                                                          │
-│  + Correção monetária 28/04 a 21/05    R$    727,16     │
-│  − Amortização parcela #5              R$  2.285,02     │
-│  ─────────────────────────────────────                   │
-│  = Saldo após parcela #5               R$ 429.629,87 ✓   │
-│                                                          │
-│  ─── Histórico de reconciliações ──────────────          │
-│                                                          │
-│  05/05/2026  ✓ R$ 0,00                                   │
-│  28/04/2026  ✓ R$ 0,00                                   │
-│  29/04/2026  ⚠ R$ 4,17 (correção monetária)              │
-│              Esclarecido em 29/04                        │
-│  29/03/2026  ✓ R$ 0,00                                   │
-│                                                          │
-│  [ Recalcular agora ]    [ Exportar memória ]            │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Tela quando há divergência:
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  ←  Reconciliação                                        │
-│                                                          │
-│  Status: ⚠ Diferença detectada                           │
-│                                                          │
-│  ─── Saldo atual ───────────────────────────────         │
-│                                                          │
-│  Saldo esperado (Tenor)    R$ 425.617,42            │
-│  Saldo declarado (DDC Itaú)     R$ 426.851,98            │
-│  Diferença                      R$ 1.234,56              │
-│                                                          │
-│  ─── Possíveis causas ─────────────────────────          │
-│                                                          │
-│  1. TR aplicada diferente do esperado                    │
-│     • Tenor usa TR projetada                        │
-│     • Banco usa TR efetiva publicada                     │
-│     • Variações típicas: ±0,1% a 0,3% por mês            │
-│     • Para saldo de R$ 426k, isso pode dar de            │
-│       R$ 426 a R$ 1.278 — bate com a diferença           │
-│                                                          │
-│  2. Operação não registrada                              │
-│     • Você fez alguma amortização que não declarou       │
-│       no Tenor?                                     │
-│                                                          │
-│  3. Erro do banco (raro)                                 │
-│     • Parcela cobrada errada, valor de juros             │
-│       calculado errado                                   │
-│                                                          │
-│  ─── O que fazer ───────────────────────────────         │
-│                                                          │
-│  Se você acha que é correção monetária:                  │
-│  [ Marcar como esclarecido — TR diferente ]              │
-│                                                          │
-│  Se você fez operação não declarada:                     │
-│  [ Registrar operação retroativa ]                       │
-│                                                          │
-│  Se quer investigar com o banco:                         │
-│  [ Marcar como em investigação ]                         │
-│  [ Gerar carta para o banco ]                            │
+│  O que você quer fazer?                                  │
+│  [ Foi engano meu — registrar operação ]                 │
+│  [ Quero questionar o banco → gerar carta ]              │
+│  [ Marcar como esclarecido ]                             │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **Memória de cálculo aberta.** Linha por linha, com referência a operações.
-- **Histórico de reconciliações.** Algumas têm diferença pequena por TR — fica registrado e esclarecido.
-- **Ação "gerar carta para o banco"** é diferencial grande — gera texto pronto explicando a discrepância e o que o usuário quer que o banco verifique.
+- **Explica antes de alarmar.** As 3 causas em ordem de probabilidade.
+- **Três ações concretas**, cobrindo os casos reais (foi o usuário / é o banco / já entendi).
 
 ---
 
-## Tela 7.3 — DDCs guardados
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  ←  DDCs guardados                                       │
-│                                                          │
-│  3 versões guardadas. PDFs originais preservados.        │
-│                                                          │
-│  ─── Versões ──────────────────────────────────          │
-│                                                          │
-│  ┌──────────────────────────────────────────────┐        │
-│  │ v3 — 05/05/2026                              │        │
-│  │                                              │        │
-│  │ Saldo: R$ 429.629,87                         │        │
-│  │ Parcelas restantes: 189                      │        │
-│  │ Última parcela: 21/01/2042                   │        │
-│  │                                              │        │
-│  │ [Ver PDF]  [Baixar PDF]  [Ver diff vs v2]    │        │
-│  └──────────────────────────────────────────────┘        │
-│                                                          │
-│  ┌──────────────────────────────────────────────┐        │
-│  │ v2 — 29/04/2026                              │        │
-│  │                                              │        │
-│  │ Saldo: R$ 431.187,73                         │        │
-│  │ Parcelas restantes: 189                      │        │
-│  │ Última parcela: 21/01/2042                   │        │
-│  │                                              │        │
-│  │ [Ver PDF]  [Baixar PDF]  [Ver diff vs v1]    │        │
-│  └──────────────────────────────────────────────┘        │
-│                                                          │
-│  ┌──────────────────────────────────────────────┐        │
-│  │ v1 — 26/04/2026                              │        │
-│  │                                              │        │
-│  │ Saldo: R$ 510.977,65                         │        │
-│  │ Parcelas restantes: 338                      │        │
-│  │ Última parcela: 21/06/2054                   │        │
-│  │                                              │        │
-│  │ [Ver PDF]  [Baixar PDF]                      │        │
-│  └──────────────────────────────────────────────┘        │
-│                                                          │
-│  + Adicionar nova versão                                 │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Tela 7.3.1 — Diff entre DDCs
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  ←  Diff: v2 (29/04) vs v3 (05/05)                       │
-│                                                          │
-│  ─── Mudou ────────────────────────────────────          │
-│                                                          │
-│  Saldo devedor                                           │
-│   v2: R$ 431.187,73                                      │
-│   v3: R$ 429.629,87                                      │
-│   Δ: −R$ 1.557,86 (parcela #5 paga)                      │
-│                                                          │
-│  ─── Não mudou ────────────────────────────────          │
-│                                                          │
-│  Taxa: 12,19% a.a. ✓                                     │
-│  Sistema: SAC ✓                                          │
-│  Última parcela: 21/01/2042 ✓                            │
-│  Parcelas restantes: 189 ✓                               │
-│                                                          │
-│  ─── Operações entre as versões ───────────────          │
-│                                                          │
-│  • 21/05/2026: Parcela #5 paga                           │
-│    R$ 6.578,27 (amort 2.285,27 + juros 4.159,94          │
-│    + MIP 94,45 + DFI 38,61)                              │
-│                                                          │
-│  ─── Resultado ────────────────────────────────          │
-│                                                          │
-│  ✓ Tudo consistente. Diferença explicada apenas          │
-│    pela parcela paga.                                    │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Decisões
-
-- **PDF original sempre acessível.** Imutável.
-- **Diff inteligente.** Mostra o que mudou, o que não mudou, e por quê.
-- **Resultado validado.** Se a diferença é explicada por operações conhecidas, marca consistente.
-
----
-
-## Tela 7.4 — Acessos à conta
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  ←  Acessos à conta                                      │
-│                                                          │
-│  Quem entrou na sua conta nos últimos 30 dias.           │
-│                                                          │
-│  ─── Hoje ─────────────────────────────────────          │
-│                                                          │
-│  13:42  Belo Horizonte, MG          Chrome/macOS         │
-│         IP: 187.65.xx.xx (mascarado)                     │
-│         [Detalhes]  [Não fui eu]                         │
-│                                                          │
-│  ─── Ontem ────────────────────────────────────          │
-│                                                          │
-│  09:17  Belo Horizonte, MG          iOS App / iPhone     │
-│  22:04  Belo Horizonte, MG          Chrome/macOS         │
-│                                                          │
-│  ─── 04/05/2026 ────────────────────────────────         │
-│                                                          │
-│  10:22  Belo Horizonte, MG          Chrome/macOS         │
-│  18:31  Belo Horizonte, MG          iOS App / iPhone     │
-│                                                          │
-│  ─── 03/05/2026 ────────────────────────────────         │
-│                                                          │
-│  14:08  Belo Horizonte, MG          Chrome/macOS         │
-│                                                          │
-│  ...                                                     │
-│                                                          │
-│  ─────────────────────────────────────                   │
-│                                                          │
-│  ⚠ Encerrar todas as sessões ativas                      │
-│  Útil se você usou um computador público                 │
-│                                                          │
-│  [ Encerrar sessões ]                                    │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Tela 7.4.1 — "Não fui eu"
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  ⚠  Acesso suspeito reportado                            │
-│                                                          │
-│  Tenor vai:                                         │
-│  ✓ Encerrar todas as sessões ativas                      │
-│  ✓ Bloquear novo login por 24 horas                      │
-│  ✓ Forçar você a redefinir senha (e MFA se ativo)        │
-│  ✓ Notificar nosso DPO para investigar                   │
-│  ✓ Te enviar um e-mail com instruções                    │
-│                                                          │
-│  Você pode reverter isso em até 1 hora caso tenha        │
-│  reportado por engano.                                   │
-│                                                          │
-│  [ Confirmar reporte ]    [ Cancelar ]                   │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Decisões
-
-- **IP mascarado** parcialmente — útil para reconhecer região, sem expor IP completo.
-- **"Não fui eu"** é botão de pânico que faz coisas concretas. Não é decoração.
-- **Reverter em 1 hora** previne acidente.
-
----
-
-## Tela 7.5 — Interações com IA
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  ←  Interações com IA                                    │
-│                                                          │
-│  8 conversas nos últimos 30 dias.                        │
-│                                                          │
-│  ⓘ Conversas mais antigas que 30 dias são apagadas       │
-│    automaticamente. Você pode apagar antes a qualquer    │
-│    momento.                                              │
-│                                                          │
-│  ─── Histórico ────────────────────────────────          │
-│                                                          │
-│  06/05  14:23  "Vale a pena portar pro Caixa?"           │
-│                Modelo: Claude (Anthropic)                │
-│                Dados enviados: saldo, taxa, prazo        │
-│                Dados redacted: nome, conta, agência      │
-│                [Ver conversa]  [Ver dados enviados]      │
-│                                                          │
-│  06/05  10:08  "Quanto economizo amortizando 30k?"       │
-│                [Ver conversa]  [Ver dados enviados]      │
-│                                                          │
-│  04/05  19:47  "Quando devo usar FGTS?"                  │
-│                [Ver conversa]  [Ver dados enviados]      │
-│                                                          │
-│  ...                                                     │
-│                                                          │
-│  ─────────────────────────────────────                   │
-│                                                          │
-│  [ Apagar todas ]    [ Exportar histórico ]              │
-│                                                          │
-│  [ Desativar IA ]    Não enviar mais dados a LLMs        │
-│                      externos                            │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Tela 7.5.1 — "Ver dados enviados"
-
-```
-┌──────────────────────────────────────────────────────────┐
-│  ←  Dados enviados ao LLM                                │
-│                                                          │
-│  Pergunta: "Vale a pena portar pro Caixa?"               │
-│  Data: 06/05/2026 às 14:23                               │
-│  Provedor: Anthropic (Zero Data Retention)               │
-│                                                          │
-│  ─── Dados enviados ───────────────────────────          │
-│                                                          │
-│  saldo_devedor:           429629.87                      │
-│  taxa_anual_efetiva:      0.1219                         │
-│  taxa_mensal:             0.009631393                    │
-│  prazo_remanescente:      189                            │
-│  sistema_amortizacao:     "SAC"                          │
-│  pergunta_usuario:        "Vale a pena portar pro Caixa?"│
-│  resultado_calculo:       (objeto com simulações)        │
-│                                                          │
-│  ─── Dados NÃO enviados ───────────────────────          │
-│                                                          │
-│  ✓ Seu nome                                              │
-│  ✓ CPF (já não é armazenado)                             │
-│  ✓ Conta bancária                                        │
-│  ✓ Agência                                               │
-│  ✓ Número de contrato bancário                           │
-│  ✓ Endereço de IP                                        │
-│  ✓ Outros contratos da sua conta                         │
-│                                                          │
-│  ─── Política do provedor ─────────────────────          │
-│                                                          │
-│  Anthropic não usa esses dados para treinar              │
-│  modelos. Contrato Zero Data Retention.                  │
-│  [Política Anthropic]                                    │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-### Decisões
-
-- **Dados enviados são literais.** Mesmo formato técnico, sem floreios.
-- **Lista de NÃO enviados é tão importante quanto enviados.**
-- **Link para política do provedor.** Auditável externamente.
-
----
-
-## Tela 7.6 — Carta para o banco (gerada)
-
-Quando o usuário aciona "Gerar carta para o banco" na reconciliação:
+## Tela 7.3 — Carta para o banco
 
 ```
 ┌──────────────────────────────────────────────────────────┐
 │  ←  Carta para o banco                                   │
 │                                                          │
-│  Tenor pode gerar um documento explicando a         │
-│  divergência detectada. Ele serve como ponto de          │
-│  partida para discutir com o banco — você revisa,        │
-│  ajusta, e envia (não geramos correspondência            │
-│  automaticamente).                                       │
+│  Geramos um rascunho explicando a diferença, com a       │
+│  conta detalhada. Você revisa, ajusta e envia — a        │
+│  gente nunca manda nada no seu lugar.                    │
 │                                                          │
-│  ─── Documento gerado ─────────────────────────          │
+│  ┌────────────────────────────────────────────┐         │
+│  │  À [Banco],                                   │       │
+│  │  Refente ao contrato de financiamento [...],  │       │
+│  │  identifiquei uma divergência de R$ 1.234,56  │       │
+│  │  no saldo devedor de 05/05/2026...            │       │
+│  │  [conta detalhada]                            │       │
+│  └────────────────────────────────────────────┘         │
 │                                                          │
-│  Para: Itaú Unibanco — Carteira Hipotecária              │
-│  Assunto: Solicitação de esclarecimento — Contrato       │
-│  10300539502                                             │
-│                                                          │
-│  Prezados,                                               │
-│                                                          │
-│  Identifiquei uma divergência entre o saldo devedor      │
-│  apresentado no DDC de 05/05/2026 (R$ 426.851,98) e o    │
-│  saldo esperado conforme histórico de operações          │
-│  (R$ 425.617,42), totalizando uma diferença de           │
-│  R$ 1.234,56.                                            │
-│                                                          │
-│  Histórico considerado:                                  │
-│   • Saldo após parcela #4 (DDC 26/04): R$ 510.977,65    │
-│   • Amortização extra 28/04 de R$ 80.000,00             │
-│   • Juros pró-rata 21/04 a 28/04: R$ 178,73             │
-│   • Atualização monetária declarada: R$ 31,35           │
-│   • Parcela #5 (DDC 05/05): amort R$ 2.285,27           │
-│                                                          │
-│  Solicito esclarecimento sobre:                          │
-│   1. Aplicação da TR no período                          │
-│   2. Eventuais correções monetárias adicionais          │
-│   3. Confirmação de que todas as operações foram        │
-│      registradas                                          │
-│                                                          │
-│  Aguardo retorno em até 5 dias úteis, conforme           │
-│  resolução do Banco Central.                             │
-│                                                          │
-│  Atenciosamente,                                         │
-│  Thiago Meireles Grabe                                   │
-│  Contrato: 10300539502                                   │
-│                                                          │
-│  ─────────────────────────────────────                   │
-│                                                          │
-│  [ Editar texto ]  [ Baixar PDF ]  [ Copiar texto ]      │
+│  [ Copiar texto ]   [ Baixar PDF ]                       │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **Tenor gera ponto de partida**, não envia automaticamente.
-- **Texto é editável.** Usuário ajusta antes de mandar.
-- **Cita resolução do BC.** Direito do consumidor reforçado.
+- **Rascunho, não envio.** O usuário no controle — sem ação irreversível automática.
+- **Inclui a memória de cálculo** — munição para a conversa com o gerente.
 
 ---
 
-## Tela 7.7 — Exportação total
+## Tela 7.4 — Histórico de conferências
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  ←  Exportar dados deste contrato                        │
+│  ←  Histórico de conferências                            │
 │                                                          │
-│  Você pode exportar tudo o que está guardado sobre       │
-│  este contrato a qualquer momento. Direito de            │
-│  portabilidade da LGPD.                                  │
+│  05/05/2026   ✓ R$ 0,00                                  │
+│  28/04/2026   ✓ R$ 0,00                                  │
+│  29/03/2026   ⚠ R$ 4,17 (correção monetária)             │
+│               Esclarecido em 29/03                        │
+│  29/02/2026   ✓ R$ 0,00                                  │
 │                                                          │
-│  ─── O que vai ser exportado ──────────────────          │
+│  [ Exportar histórico ]                                  │
 │                                                          │
-│  ✓ DDCs originais em PDF (3 versões)                     │
-│  ✓ Linha do tempo completa em PDF e CSV                  │
-│  ✓ Cenários salvos em JSON estruturado                   │
-│  ✓ Reconciliações em CSV                                 │
-│  ✓ Logs de IA em JSON                                    │
-│  ✓ Logs de acesso à conta em CSV                         │
-│  ✓ Notas livres em texto plano                           │
+└──────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Tela 7.5 — Meus dados (privacidade como parte do guardião)
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  ←  Meus dados                                           │
 │                                                          │
-│  ─── Formato ──────────────────────────────────          │
+│  ✓ Análise por IA (Claude / Anthropic)      [ revogar ]  │
+│    Dados anonimizados antes de enviar                    │
+│    Enviado: saldo, taxa, prazo                           │
+│    NÃO enviado: seu nome, CPF, conta, agência            │
 │                                                          │
-│  Tudo será compactado em um arquivo ZIP com              │
-│  estrutura:                                              │
+│  ── Quem processa seus dados ──────────────              │
+│   • Anthropic — IA, com Zero Data Retention              │
+│   • (hospedagem / banco de dados / e-mail)               │
+│   [ Ver detalhes de cada um ]                            │
 │                                                          │
-│   marco_zero_export_<data>/                              │
-│   ├─ ddcs/                                               │
-│   │   ├─ ddc_v1_2026-04-26.pdf                           │
-│   │   ├─ ddc_v2_2026-04-29.pdf                           │
-│   │   └─ ddc_v3_2026-05-05.pdf                           │
-│   ├─ linha_do_tempo.pdf                                  │
-│   ├─ linha_do_tempo.csv                                  │
-│   ├─ cenarios.json                                       │
-│   ├─ reconciliacoes.csv                                  │
-│   ├─ interacoes_ia.json                                  │
-│   ├─ acessos.csv                                         │
-│   └─ notas.txt                                           │
+│  ── Histórico de acesso ──────────────────               │
+│   Hoje 13:42   Belo Horizonte, MG   Chrome               │
+│   Ontem 09:17  Belo Horizonte, MG   App                  │
+│   Suspeita de acesso indevido? [ contato ]               │
 │                                                          │
-│  Tamanho estimado: ~2,4 MB                               │
+│  ── Sua conta ─────────────────────────────              │
+│  [ Exportar tudo (ZIP) ]                                 │
+│  [ Pausar conta ]                                        │
+│  [ Excluir conta ] — apaga tudo, 7 dias de cooldown      │
 │                                                          │
-│  ─── Privacidade do export ────────────────────          │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Tela 7.5.1 — "Ver dados enviados ao LLM"
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  ←  Dados enviados à IA                                  │
 │                                                          │
-│  ⚠ O ZIP gerado não tem criptografia adicional.          │
-│    Cuide para guardar em local seguro depois.            │
+│  Pergunta: "Vale a pena portar pro Caixa?"               │
+│  Data: 06/05/2026 às 14:23                               │
+│  Provedor: Anthropic (Zero Data Retention)               │
 │                                                          │
-│  [ Gerar e baixar ]    [ Cancelar ]                      │
+│  ── Enviado ──                                           │
+│   saldo_devedor:      429629.87                          │
+│   taxa_mensal:        0.009631393                        │
+│   prazo_meses:        189                                │
+│   sistema:            "SAC"                               │
+│   pergunta:           (seu texto)                        │
+│                                                          │
+│  ── NÃO enviado ──                                       │
+│   ✓ Seu nome   ✓ CPF   ✓ Conta   ✓ Agência   ✓ IP        │
+│                                                          │
+│  Anthropic não usa esses dados pra treinar modelos.      │
+│  [ Política da Anthropic ]                               │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
 ### Decisões
-
-- **Lista exatamente o que vai ser exportado.** Sem surpresa.
-- **Estrutura do ZIP visível.** Usuário sabe o que vai abrir.
-- **Aviso sobre cuidado pós-export.** Honestidade — uma vez fora do produto, é responsabilidade do usuário.
+- **A privacidade é vendida como proteção** — coerente com o guardião.
+- **Lista de "NÃO enviado" é tão importante quanto a de "enviado"** — comunica disciplina.
+- **Provedor de IA é Anthropic/Claude (ZDR)** — alinhado à decisão de stack.
 
 ---
 
-## Diferenças por plano
+## Casos de borda
 
-| Funcionalidade | Básico | Plus | Avançado |
-|---|---|---|---|
-| Linha do tempo | ✓ | ✓ | ✓ |
-| Detalhamento de parcela | ✓ | ✓ | ✓ |
-| DDCs guardados (versões) | última | últimas 5 | ilimitado |
-| Reconciliação automática | — | ✓ | ✓ |
-| Memória de cálculo | — | ✓ | ✓ |
-| Diff entre DDCs | — | ✓ | ✓ |
-| Carta para o banco | — | — | ✓ |
-| Logs de acesso (período) | 7 dias | 30 dias | 90 dias |
-| Logs de IA | — | 30 dias | 90 dias |
-| Exportação total | ✓ | ✓ | ✓ |
+### Divergência recorrente
+```
+Essa diferença aparece todo mês? Pode ser um padrão na
+forma como o banco aplica a TR. Quer que eu monte um
+resumo dos últimos 6 meses pra levar ao banco?
+```
 
-**Importante**: exportação total e linha do tempo básica são gratuitas — direitos LGPD não escalam por plano.
+### Usuário não entende a memória de cálculo
+```
+Não precisa entender a conta toda. O importante: o saldo
+bate (✓) ou não bate (⚠). Se não bate, eu te explico o
+porquê em uma frase e te ajudo a resolver.
+```
+
+---
+
+## Diferenças nicho × massa
+
+| | Nicho (Quitador) | Massa (Confuso) |
+|---|---|---|
+| Nome da feature | Reconciliação / Audit | Conferindo o banco |
+| Papel | Nice-to-have, transparência | Valor emocional central |
+| Memória de cálculo | Quer ver tudo | Confia no selo; vê se quiser |
+| Privacidade | Disciplina técnica | Parte da proteção emocional |
 
 ---
 
@@ -590,27 +227,6 @@ Quando o usuário aciona "Gerar carta para o banco" na reconciliação:
 
 | Métrica | Meta |
 |---|---|
-| Taxa de usuários que abrem Audit pelo menos 1× | > 40% em 90 dias |
-| Taxa de uso da reconciliação (Plus+) | > 30% mensalmente |
-| Taxa de exportação total | < 5% (sinal de saída) |
-| Taxa de "não fui eu" disparado | < 0,1% (idealmente quase zero) |
-| Diferenças detectadas vs falsas-positivas | razão > 5:1 |
-
----
-
-## Relação com privacidade
-
-Esta jornada é a mais **alinhada estruturalmente com LGPD**. Ela materializa direitos:
-
-- **Direito de acesso (Art. 18, II)** → linha do tempo, reconciliação, todos os dados visíveis.
-- **Direito de informação sobre uso (Art. 18, V)** → logs de IA com dados enviados.
-- **Direito de portabilidade (Art. 18, VI)** → exportação total em formato aberto.
-- **Direito à confirmação (Art. 18, I)** → tudo confirma o que existe.
-- **Direito de revisão de decisão automatizada (Art. 20)** → "Como vocês chegaram nisso?" em qualquer recomendação da IA.
-
-### Outras decisões de privacidade
-
-- **Retenção de logs por plano**, mas direitos LGPD são iguais para todos.
-- **Apagar conversas de IA** é botão único, sem fricção.
-- **Desativar IA** é toggle simples — não envia mais dados externamente.
-- **Carta para o banco** não é enviada por Tenor — usuário tem controle total.
+| Usuários que abrem "Conferindo o banco" | menor que outras telas, mas alto valor |
+| Confiança/retenção de quem viu ≥ 1 conferência ✓ | maior que a média |
+| Uso de "gerar carta" em divergências | sinal de valor de proteção |

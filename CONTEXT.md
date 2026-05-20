@@ -77,7 +77,29 @@ Diferença de simulador para copiloto:
 - Nunca "processar" → sempre "analisar seu contrato"
 
 ### Naming
-Tenor — o ponto de quitação. Brasileiro, memorável. Venceu sobre "Soleira" e "Esquadro".
+Tenor — o prazo contratual de um empréstimo (banking term). Para profissionais de finanças, carrega significado técnico imediato. Para o usuário comum, é uma palavra curta e elegante. Conversa com a marca-irmã Alpendre dentro do portfólio de "sofisticação tropical".
+
+### Dois públicos (estratégia de expansão)
+
+O Tenor atende dois perfis sobre a MESMA engine de cálculo determinística.
+A sequência é deliberada: validar no nicho, depois descer para a massa.
+
+- **Nicho — "o Quitador" (fase atual).** Saldo alto, capital sobrando,
+  letramento financeiro, mentalidade FIRE. Quer otimizar a quitação.
+  Feature-âncora: cenários, comparação amortizar vs investir, stress tests.
+  Disposição a pagar alta. Tolera produto cru. É quem valida a engine.
+
+- **Massa — "o Confuso/Ansioso" (fase de expansão).** Renda média,
+  orçamento apertado, baixo letramento financeiro. Quer ENTENDER o que
+  paga, saber QUANDO acaba e ter certeza de que o banco está certo.
+  Feature-âncora: tradução do boleto, data de quitação, chat como
+  tradutor, "conferindo o banco" (reconciliação) como guardião.
+  Disposição a pagar baixa-média (R$ 9-12/mês ou vitalício R$ 297).
+
+A engine é compartilhada; o que muda entre os dois é a porta de entrada
+(foto do boleto vs DDC), a linguagem (tradução vs termos técnicos) e a
+feature-âncora. NÃO servir os dois na mesma tela: a escolha de público é
+por fluxo.
 
 ### Estética
 **Dark premium** — inspirado em Cumbuca, Linear, Vercel dashboard. Técnico, moderno, premium.

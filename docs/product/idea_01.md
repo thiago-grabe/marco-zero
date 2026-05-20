@@ -288,3 +288,35 @@ A combinação dessas três coisas transforma o produto de "simulador bonito" em
 - [ ] Modelo de preços que respeita LGPD (sem dark patterns)
 - [ ] Schema relacional concreto (depois)
 - [ ] Spec funcional do parser por banco (depois)
+
+---
+
+## Generalização para a massa
+
+A massa de mutuários não quer otimizar a quitação — quer entender o que
+paga, saber quando acaba e não ser enganada pelo banco. Generalizar não é
+adicionar features; é mudar a DOR central que o produto resolve.
+
+Quatro eixos da virada:
+
+1. De "otimizador" para "tradutor". A feature mais universal é explicar o
+   contrato em português ("R$ 812 da sua parcela são juros, R$ 94 é um
+   seguro chamado MIP"). É o gancho de entrada.
+2. De "amortização grande" para "qualquer adiantamento". "Arredondar a
+   parcela de R$ 1.247 pra R$ 1.300 corta 14 meses" é acessível e
+   democrático.
+3. De "ferramenta de cálculo" para "guardião contra o banco". A
+   reconciliação/audit vira o valor emocional central: "alguém do meu lado
+   conferindo o banco". Vender proteção, não otimização.
+4. De "FIRE/finanças avançadas" para "tranquilidade". Menos "maximize o
+   retorno marginal", mais "veja quando se livra disso e durma melhor".
+
+Preços de massa: free generoso (clareza + "quando acaba" + 1 conferência),
+pago barato (R$ 9-12/mês) e vitalício (R$ 297) para destravar caixa e
+contornar o churn alto (decisão mensal, baixa frequência). Monetização por
+portabilidade fica fora por ora — conflita com a promessa de privacidade.
+
+Cuidado central: começar pelo nicho (paga e tolera produto cru), validar a
+engine e a reconciliação, e DEPOIS descer para a massa simplificando o
+onboarding e trocando o discurso de otimização por clareza/proteção. O
+inverso (começar largo, nichar depois) é mais caro e mais difícil.

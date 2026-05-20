@@ -21,11 +21,18 @@ Ninguém deveria precisar de planilhas complexas ou 6 conversas com uma IA para 
 
 ---
 
-## O que é e para quem
+## Posicionamento
 
-Tenor é para o brasileiro que comprou um imóvel financiado e quer tomar decisões melhores sobre a maior dívida da vida. Profissional de TI que recebeu o bônus e não sabe se amortiza ou investe. Jovem casal que quer saber quando quita se amortizar R$ 5 mil por mês. Consultor que recebe PLR anual e quer ver o impacto de jogar tudo no financiamento em abril.
+**Tenor** é o cofre privado do seu financiamento imobiliário: você guarda
+seus contratos, entende o que paga, vê quando termina e confere se o banco
+está certo — sem integração bancária e com soberania de dados.
 
-O produto nasceu de uma situação real: uma série de conversas sobre amortização que revelou que os simuladores de banco são enganosos, a nomenclatura é confusa ("reduzir prazo" vs "reduzir parcela" significam coisas diferentes do que o nome sugere), e nenhuma ferramenta existente persiste o contrato ou calcula de verdade.
+Estratégia de dois estágios sobre a mesma engine de cálculo:
+- **Nicho (atual):** otimização de quitação para quem tem capital e
+  letramento financeiro.
+- **Massa (expansão):** clareza e proteção para todo mundo com um
+  apartamento financiado — "entenda seu financiamento, saiba quando acaba,
+  veja se o banco está certo".
 
 ---
 
