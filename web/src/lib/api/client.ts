@@ -167,8 +167,15 @@ export interface QuickContractCreate {
   taxa_mensal?: number; // opcional — se informada, cálculo exato
 }
 
+export interface DataAlert {
+  tipo: string;
+  mensagem: string;
+  severidade: "aviso" | "erro";
+}
+
 export interface QuickContractResponse extends ContractResponse {
   campos_estimados: string[];
+  alertas: DataAlert[];
 }
 
 export const contractsApi = {

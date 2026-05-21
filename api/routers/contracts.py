@@ -19,11 +19,13 @@ from models.contract import (
     ContractCreate,
     ContractResponse,
     ContractUpdate,
+    DataAlert,
     QuickContractCreate,
     QuickContractResponse,
 )
 from motor import sac
 from motor.estimator import estimate_from_minimal
+from motor.selic import get_selic_anual, taxa_range_from_selic
 
 router = APIRouter(prefix="/contracts", tags=["contracts"])
 
@@ -232,10 +234,87 @@ async def create_contract_quick(
     await session.refresh(contract)
 
     response = _build_response(contract)
+
+    # Validar dados contra a Selic vigente e gerar alertas
+    alertas = await _build_alerts(
+        taxa_mensal=estimated["taxa_mensal"],
+        prazo=estimated["prazo_remanescente"],
+        parcela=body.parcela_mensal,
+        saldo=body.saldo_devedor,
+        taxa_informada=body.taxa_mensal is not None,
+    )
+
     return QuickContractResponse(
         **response.model_dump(),
         campos_estimados=campos_estimados,
+        alertas=alertas,
     )
+
+
+async def _build_alerts(
+    taxa_mensal: float,
+    prazo: int,
+    parcela: float,
+    saldo: float,
+    taxa_informada: bool,
+) -> list[DataAlert]:
+    """Gera alertas quando os dados parecem fora do padrão."""
+    alertas: list[DataAlert] = []
+
+    try:
+        selic = await get_selic_anual()
+        taxa_min, taxa_max = taxa_range_from_selic(selic)
+    except Exception:
+        return alertas  # sem alertas se não conseguir a Selic
+
+    taxa_aa = (1 + taxa_mensal) ** 12 - 1
+    selic_str = f"{selic:.2f}".replace(".", ",")
+
+    # Taxa acima do range de mercado
+    if taxa_mensal > taxa_max:
+        taxa_aa_str = f"{taxa_aa * 100:.1f}".replace(".", ",")
+        teto_aa = f"{((1 + taxa_max) ** 12 - 1) * 100:.1f}".replace(".", ",")
+        alertas.append(DataAlert(
+            tipo="taxa_alta",
+            mensagem=f"A taxa estimada ({taxa_aa_str}% a.a.) está acima do normal para o mercado atual "
+                     f"(teto ~{teto_aa}% a.a. com Selic a {selic_str}%). "
+                     f"{'Confira a taxa no seu contrato.' if not taxa_informada else 'Confira se a taxa informada está correta.'}",
+            severidade="aviso",
+        ))
+
+    # Taxa abaixo do range
+    if taxa_mensal < taxa_min:
+        taxa_aa_str = f"{taxa_aa * 100:.1f}".replace(".", ",")
+        piso_aa = f"{((1 + taxa_min) ** 12 - 1) * 100:.1f}".replace(".", ",")
+        alertas.append(DataAlert(
+            tipo="taxa_baixa",
+            mensagem=f"A taxa estimada ({taxa_aa_str}% a.a.) está abaixo do normal "
+                     f"(piso ~{piso_aa}% a.a. com Selic a {selic_str}%). "
+                     f"O saldo ou a parcela podem estar incorretos.",
+            severidade="aviso",
+        ))
+
+    # Prazo excessivamente longo
+    if prazo > 420:
+        alertas.append(DataAlert(
+            tipo="prazo_longo",
+            mensagem=f"O prazo estimado ({prazo} meses = {prazo // 12} anos) é maior que o máximo do "
+                     f"mercado (35 anos). Confira o saldo devedor e o valor da parcela.",
+            severidade="aviso",
+        ))
+
+    # Parcela muito baixa em relação ao saldo (pode indicar PRICE ou dados errados)
+    ratio = parcela / saldo if saldo > 0 else 0
+    if ratio < 0.002 and saldo > 50000:
+        alertas.append(DataAlert(
+            tipo="parcela_saldo",
+            mensagem=f"A parcela (R$ {parcela:,.2f}) parece muito baixa para o saldo "
+                     f"(R$ {saldo:,.2f}). Pode ser que o saldo esteja em centavos no app "
+                     f"do banco, ou que a parcela informada esteja incompleta.",
+            severidade="aviso",
+        ))
+
+    return alertas
 
 
 @router.get("/{contract_id}", response_model=ContractResponse)

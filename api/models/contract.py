@@ -95,9 +95,17 @@ class QuickContractCreate(BaseModel):
                                           description="Taxa mensal em decimal (ex: 0.009631). Se não informada, é estimada.")
 
 
+class DataAlert(BaseModel):
+    """Alerta sobre dados fora do padrão."""
+    tipo: str  # "taxa_alta", "taxa_baixa", "parcela_saldo", "prazo_longo"
+    mensagem: str
+    severidade: str = "aviso"  # "aviso" ou "erro"
+
+
 class QuickContractResponse(ContractResponse):
-    """Resposta do quick com lista de campos estimados."""
+    """Resposta do quick com lista de campos estimados e alertas."""
     campos_estimados: list[str] = []
+    alertas: list[DataAlert] = []
 
 
 class OperationCreate(BaseModel):

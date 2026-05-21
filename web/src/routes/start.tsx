@@ -47,6 +47,12 @@ function Start() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
       setActiveContractId(data.id);
+      // Salvar alertas para a tela de insight
+      if (data.alertas?.length > 0) {
+        sessionStorage.setItem("tenor-alertas", JSON.stringify(data.alertas));
+      } else {
+        sessionStorage.removeItem("tenor-alertas");
+      }
       navigate({
         to: "/insight",
         search: { estimated: isEstimated },

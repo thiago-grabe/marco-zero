@@ -1,7 +1,9 @@
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useActiveContract } from "@/hooks/useContract";
 import { formatBRL, formatMonthYear } from "@/lib/utils";
-import { Shield, BarChart3, MessageSquare } from "lucide-react";
+import { Shield, BarChart3, MessageSquare, AlertTriangle, X } from "lucide-react";
+import type { DataAlert } from "@/lib/api/client";
 
 export const Route = createFileRoute("/insight")({
   component: Insight,
@@ -13,6 +15,16 @@ export const Route = createFileRoute("/insight")({
 function Insight() {
   const { data: contract } = useActiveContract();
   const { estimated } = useSearch({ from: "/insight" });
+  const [alertas, setAlertas] = useState<DataAlert[]>([]);
+  const [dismissedAlerts, setDismissedAlerts] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const raw = sessionStorage.getItem("tenor-alertas");
+    if (raw) {
+      try { setAlertas(JSON.parse(raw)); } catch { /* */ }
+      sessionStorage.removeItem("tenor-alertas");
+    }
+  }, []);
 
   if (!contract) {
     return (
@@ -42,9 +54,28 @@ function Insight() {
 
   return (
     <div className="min-h-screen bg-background px-6 py-10 max-w-lg mx-auto">
-      <p className="text-xs text-muted-foreground mb-8">
+      <p className="text-xs text-muted-foreground mb-4">
         {contract.banco.toUpperCase()} · {contract.sistema_amortizacao}
       </p>
+
+      {/* Alertas de dados fora do padrão */}
+      {alertas.filter((a) => !dismissedAlerts.has(a.tipo)).map((alerta) => (
+        <div
+          key={alerta.tipo}
+          className="mb-4 border border-warning/40 rounded-lg p-4 bg-warning/5 flex gap-3 items-start"
+        >
+          <AlertTriangle size={16} className="text-warning shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm text-foreground leading-relaxed">{alerta.mensagem}</p>
+          </div>
+          <button
+            onClick={() => setDismissedAlerts((s) => new Set(s).add(alerta.tipo))}
+            className="text-muted-foreground hover:text-foreground shrink-0"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      ))}
 
       {/* Hero — data de quitação */}
       <div className="text-center mb-10">
