@@ -29,7 +29,12 @@ function Start() {
   const [parcela, setParcela] = useState("");
   const [banco, setBanco] = useState("");
   const [saldo, setSaldo] = useState("");
+  const [taxa, setTaxa] = useState("");
   const [showHelp, setShowHelp] = useState(false);
+
+  const taxaNum = parseNumber(taxa);
+  const taxaDecimal = taxaNum > 0 ? taxaNum / 100 : undefined;
+  const isEstimated = !taxaDecimal;
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -37,13 +42,14 @@ function Start() {
         parcela_mensal: parseNumber(parcela),
         banco,
         saldo_devedor: parseNumber(saldo),
+        ...(taxaDecimal ? { taxa_mensal: taxaDecimal } : {}),
       }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["contracts"] });
       setActiveContractId(data.id);
       navigate({
         to: "/insight",
-        search: { estimated: true },
+        search: { estimated: isEstimated },
       });
     },
   });
@@ -58,7 +64,7 @@ function Start() {
 
       <div className="mt-8 mb-8">
         <h1 className="font-serif text-2xl font-semibold mb-2">
-          Só preciso de 3 números
+          Só preciso de alguns números
         </h1>
         <p className="text-muted-foreground text-sm leading-relaxed">
           Você acha todos no app do seu banco ou no boleto do mês.
@@ -132,6 +138,32 @@ function Start() {
           </div>
           <p className="text-xs text-muted-foreground mt-1.5">
             No app do banco aparece como "saldo devedor"
+          </p>
+        </div>
+
+        {/* Taxa (opcional) */}
+        <div>
+          <label className="text-sm text-foreground block mb-2">
+            Sabe a taxa de juros? <span className="text-muted-foreground">(opcional)</span>
+          </label>
+          <div className="relative">
+            <input
+              type="text"
+              inputMode="decimal"
+              value={taxa}
+              onChange={(e) => setTaxa(e.target.value)}
+              placeholder="0,96"
+              className="w-full bg-muted border border-border rounded-md pl-4 pr-12 py-3
+                         text-sm text-foreground placeholder:text-muted-foreground
+                         focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+            <span className="absolute right-3 top-3 text-muted-foreground text-sm">% a.m.</span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1.5">
+            {taxa && taxaDecimal
+              ? `= ${((1 + taxaDecimal) ** 12 * 100 - 100).toFixed(2).replace(".", ",")}% ao ano`
+              : "Aparece no contrato como \"taxa mensal\". Sem ela, os valores são estimados."
+            }
           </p>
         </div>
       </div>

@@ -164,6 +164,7 @@ export interface QuickContractCreate {
   parcela_mensal: number;
   banco: string;
   saldo_devedor: number;
+  taxa_mensal?: number; // opcional — se informada, cálculo exato
 }
 
 export interface QuickContractResponse extends ContractResponse {

@@ -147,7 +147,7 @@ function Landing() {
                      px-8 py-3.5 rounded-md text-sm font-medium
                      hover:bg-primary/90 transition-colors"
         >
-          Começar — são só 3 números
+          Começar — é rápido
         </Link>
 
         <p className="mt-4 text-xs text-muted-foreground">

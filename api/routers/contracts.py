@@ -167,8 +167,8 @@ async def create_contract_quick(
     session: AsyncSession = Depends(get_rls_session),
 ) -> QuickContractResponse:
     """
-    Caminho de massa: cria contrato com só 3 campos.
-    O motor estima taxa, prazo, amortização e sistema.
+    Caminho de massa: 3 campos obrigatórios + taxa opcional.
+    Se a taxa for informada, o cálculo é exato. Se não, é estimado.
     """
     uid = uuid.UUID(user_id)
 
@@ -177,6 +177,35 @@ async def create_contract_quick(
         parcela_mensal=body.parcela_mensal,
         saldo_devedor=body.saldo_devedor,
     )
+
+    # Se a taxa foi informada pelo usuário, usa a real e recalcula
+    campos_estimados = [
+        "amortizacao_mensal", "prazo_remanescente",
+        "sistema_amortizacao", "data_proxima_parcela", "mip_mensal", "dfi_mensal",
+    ]
+
+    if body.taxa_mensal is not None:
+        # Taxa informada → cálculo exato
+        taxa = body.taxa_mensal
+        import math
+        from motor.sac import add_months
+        from datetime import date
+
+        juros = body.saldo_devedor * taxa
+        seguros_est = body.parcela_mensal * 0.02
+        amort = body.parcela_mensal - juros - seguros_est
+        if amort > 0:
+            prazo = max(1, round(body.saldo_devedor / amort))
+        else:
+            prazo = estimated["prazo_remanescente"]
+            amort = estimated["amortizacao_mensal"]
+
+        estimated["taxa_mensal"] = taxa
+        estimated["amortizacao_mensal"] = round(amort, 2)
+        estimated["prazo_remanescente"] = prazo
+        # taxa NÃO é estimada nesse caso
+    else:
+        campos_estimados.insert(0, "taxa_mensal")
 
     prop = Property(user_id=uid, apelido="Apartamento")
     session.add(prop)
@@ -202,10 +231,7 @@ async def create_contract_quick(
     response = _build_response(contract)
     return QuickContractResponse(
         **response.model_dump(),
-        campos_estimados=[
-            "taxa_mensal", "amortizacao_mensal", "prazo_remanescente",
-            "sistema_amortizacao", "data_proxima_parcela", "mip_mensal", "dfi_mensal",
-        ],
+        campos_estimados=campos_estimados,
     )
 
 

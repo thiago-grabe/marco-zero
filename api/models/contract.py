@@ -87,10 +87,12 @@ class ContractResponse(BaseModel):
 
 
 class QuickContractCreate(BaseModel):
-    """Caminho de massa: só 3 campos. O motor estima o resto."""
+    """Caminho de massa: 3 campos obrigatórios + taxa opcional."""
     parcela_mensal: float = Field(gt=0)
     banco: str = Field(min_length=1)
     saldo_devedor: float = Field(gt=0)
+    taxa_mensal: Optional[float] = Field(default=None, gt=0.001, lt=0.03,
+                                          description="Taxa mensal em decimal (ex: 0.009631). Se não informada, é estimada.")
 
 
 class QuickContractResponse(ContractResponse):
