@@ -37,6 +37,16 @@ def estimate_from_minimal(
     if parcela_mensal <= 0 or saldo_devedor <= 0:
         raise ValueError("parcela_mensal e saldo_devedor devem ser > 0")
 
+    # Validação de coerência: a parcela precisa cobrir ao menos os juros mínimos
+    # Taxa mínima do mercado BR: ~0.3% a.m. (Minha Casa subsidiado)
+    juros_minimos = saldo_devedor * 0.003
+    if parcela_mensal < juros_minimos:
+        raise ValueError(
+            f"A parcela de R$ {parcela_mensal:,.2f} parece baixa para um saldo "
+            f"de R$ {saldo_devedor:,.2f}. Confira os valores — a parcela precisa "
+            f"cobrir ao menos os juros mensais (mínimo estimado: R$ {juros_minimos:,.2f})."
+        )
+
     if parcela_mensal >= saldo_devedor:
         # Parcela maior que saldo = quase quitado
         return {

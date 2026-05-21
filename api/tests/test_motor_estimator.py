@@ -85,6 +85,18 @@ def test_parcela_reconstruida_bate():
     assert abs(parcela_reconstruida - parcela_informada) < 50.0
 
 
+def test_parcela_muito_baixa_para_saldo():
+    """Parcela R$ 1.247 para saldo R$ 429.000 não cobre os juros mínimos."""
+    with pytest.raises(ValueError, match="parcela.*parece baixa"):
+        estimate_from_minimal(parcela_mensal=1247.0, saldo_devedor=429000.0)
+
+
+def test_parcela_coerente_nao_levanta():
+    """Parcela R$ 6.556 para saldo R$ 429.000 é coerente."""
+    result = estimate_from_minimal(parcela_mensal=6556.0, saldo_devedor=429000.0)
+    assert result["taxa_mensal"] > 0
+
+
 def test_campos_completos():
     """O retorno tem todos os campos necessários para criar contrato."""
     result = estimate_from_minimal(parcela_mensal=2000.0, saldo_devedor=200000.0)

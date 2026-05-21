@@ -173,10 +173,13 @@ async def create_contract_quick(
     uid = uuid.UUID(user_id)
 
     # Estimar campos faltantes
-    estimated = estimate_from_minimal(
-        parcela_mensal=body.parcela_mensal,
-        saldo_devedor=body.saldo_devedor,
-    )
+    try:
+        estimated = estimate_from_minimal(
+            parcela_mensal=body.parcela_mensal,
+            saldo_devedor=body.saldo_devedor,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
     # Se a taxa foi informada pelo usuário, usa a real e recalcula
     campos_estimados = [

@@ -17,9 +17,9 @@ function friendlyError(status: number, detail: string): string {
     return "Sua sessão expirou. Estamos renovando automaticamente — tente novamente.";
   }
   if (status === 422) {
-    // Validação — tentar extrair algo útil
-    if (detail.includes("taxa_mensal") || detail.includes("gt")) {
-      return "Verifique os valores informados. Algum campo está fora do esperado.";
+    // Se o backend enviou mensagem em português (ex: validação do estimador), mostrar direto
+    if (detail.includes("parcela") || detail.includes("Confira") || detail.includes("parece")) {
+      return detail;
     }
     return "Verifique os dados informados e tente novamente.";
   }
