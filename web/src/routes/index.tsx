@@ -132,24 +132,29 @@ function Landing() {
         </p>
 
         <h1 className="font-serif text-4xl sm:text-5xl font-semibold leading-tight text-foreground mb-6">
-          Entenda seu tenor.
+          Entenda seu financiamento.
           <br />
-          <span className="text-muted-foreground">Encurte seu prazo.</span>
+          <span className="text-muted-foreground">Saiba quando acaba.</span>
         </h1>
 
         <p className="text-muted-foreground text-lg leading-relaxed mb-10 max-w-lg mx-auto">
-          Tenor é o cofre privado do seu financiamento imobiliário. Guarde seu contrato,
-          simule cenários e saiba exatamente quando quita.
+          Me diz 3 números e em 30 segundos eu te mostro o que você está pagando — e quando se livra disso.
         </p>
 
         <Link
-          to="/onboarding"
+          to="/start"
           className="inline-flex items-center gap-2 bg-primary text-primary-foreground
-                     px-8 py-3 rounded-md text-sm font-medium
+                     px-8 py-3.5 rounded-md text-sm font-medium
                      hover:bg-primary/90 transition-colors"
         >
-          Começar — é grátis
+          Começar — são só 3 números
         </Link>
+
+        <p className="mt-4 text-xs text-muted-foreground">
+          <Link to="/onboarding" className="underline underline-offset-2 hover:text-foreground transition-colors">
+            Quero preencher tudo na mão
+          </Link>
+        </p>
 
         <TimelineVisual />
 

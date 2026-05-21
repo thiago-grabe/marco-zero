@@ -86,6 +86,18 @@ class ContractResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class QuickContractCreate(BaseModel):
+    """Caminho de massa: só 3 campos. O motor estima o resto."""
+    parcela_mensal: float = Field(gt=0)
+    banco: str = Field(min_length=1)
+    saldo_devedor: float = Field(gt=0)
+
+
+class QuickContractResponse(ContractResponse):
+    """Resposta do quick com lista de campos estimados."""
+    campos_estimados: list[str] = []
+
+
 class OperationCreate(BaseModel):
     tipo: str = Field(pattern="^(amortizacao_prazo|amortizacao_parcela)$")
     data_operacao: date

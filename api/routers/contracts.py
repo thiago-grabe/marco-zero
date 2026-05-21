@@ -19,8 +19,11 @@ from models.contract import (
     ContractCreate,
     ContractResponse,
     ContractUpdate,
+    QuickContractCreate,
+    QuickContractResponse,
 )
 from motor import sac
+from motor.estimator import estimate_from_minimal
 
 router = APIRouter(prefix="/contracts", tags=["contracts"])
 
@@ -155,6 +158,55 @@ async def create_contract(
     await session.refresh(contract)
 
     return _build_response(contract)
+
+
+@router.post("/quick", response_model=QuickContractResponse, status_code=status.HTTP_201_CREATED)
+async def create_contract_quick(
+    body: QuickContractCreate,
+    user_id: str = Depends(get_current_user_id),
+    session: AsyncSession = Depends(get_rls_session),
+) -> QuickContractResponse:
+    """
+    Caminho de massa: cria contrato com só 3 campos.
+    O motor estima taxa, prazo, amortização e sistema.
+    """
+    uid = uuid.UUID(user_id)
+
+    # Estimar campos faltantes
+    estimated = estimate_from_minimal(
+        parcela_mensal=body.parcela_mensal,
+        saldo_devedor=body.saldo_devedor,
+    )
+
+    prop = Property(user_id=uid, apelido="Apartamento")
+    session.add(prop)
+    await session.flush()
+
+    contract = Contract(
+        user_id=uid,
+        property_id=prop.id,
+        banco=body.banco,
+        sistema_amortizacao=estimated["sistema_amortizacao"],
+        taxa_mensal=estimated["taxa_mensal"],
+        saldo_devedor=body.saldo_devedor,
+        amortizacao_mensal=estimated["amortizacao_mensal"],
+        mip_mensal=estimated["mip_mensal"],
+        dfi_mensal=estimated["dfi_mensal"],
+        data_proxima_parcela=estimated["data_proxima_parcela"],
+        prazo_remanescente=estimated["prazo_remanescente"],
+    )
+    session.add(contract)
+    await session.commit()
+    await session.refresh(contract)
+
+    response = _build_response(contract)
+    return QuickContractResponse(
+        **response.model_dump(),
+        campos_estimados=[
+            "taxa_mensal", "amortizacao_mensal", "prazo_remanescente",
+            "sistema_amortizacao", "data_proxima_parcela", "mip_mensal", "dfi_mensal",
+        ],
+    )
 
 
 @router.get("/{contract_id}", response_model=ContractResponse)

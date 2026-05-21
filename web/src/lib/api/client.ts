@@ -119,11 +119,23 @@ export const authApi = {
   me: () => apiFetch<{ id: string; nome: string | null }>("/auth/me"),
 };
 
+export interface QuickContractCreate {
+  parcela_mensal: number;
+  banco: string;
+  saldo_devedor: number;
+}
+
+export interface QuickContractResponse extends ContractResponse {
+  campos_estimados: string[];
+}
+
 export const contractsApi = {
   list: () => apiFetch<ContractResponse[]>("/contracts"),
   get: (id: string) => apiFetch<ContractResponse>(`/contracts/${id}`),
   create: (body: ContractCreate) =>
     apiFetch<ContractResponse>("/contracts", { method: "POST", body: JSON.stringify(body) }),
+  createQuick: (body: QuickContractCreate) =>
+    apiFetch<QuickContractResponse>("/contracts/quick", { method: "POST", body: JSON.stringify(body) }),
   update: (id: string, body: Partial<ContractCreate>) =>
     apiFetch<ContractResponse>(`/contracts/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
   delete: (id: string) => apiFetch<void>(`/contracts/${id}`, { method: "DELETE" }),
