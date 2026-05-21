@@ -49,8 +49,9 @@ async def get_current_user_id(
                 detail="Token inválido",
             )
         return user_id
-    except JWTError as e:
+    except JWTError:
+        # Nunca expor detalhes técnicos do JWT ao usuário
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Token inválido: {e}",
-        ) from e
+            detail="Sessão expirada",
+        )

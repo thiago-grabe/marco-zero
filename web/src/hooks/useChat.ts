@@ -9,7 +9,7 @@
  */
 
 import { useCallback, useRef, useState } from "react";
-import { getToken } from "@/lib/auth";
+import { getToken, renewAuth } from "@/lib/auth";
 import type {
   ChatContext,
   ChatMessage,
@@ -75,11 +75,22 @@ export function useChat() {
           signal: abortRef.current.signal,
         });
 
+        if (response.status === 401) {
+          // Token expirado — renova silenciosamente e retenta
+          const renewed = await renewAuth();
+          if (renewed) {
+            setMessages((prev) => prev.slice(0, -1)); // remove a msg do user que acabou de adicionar
+            setIsStreaming(false);
+            // Retenta com novo token
+            await sendMessage(contractId, message);
+            return;
+          }
+        }
+
         if (!response.ok || !response.body) {
-          const err = await response.json().catch(() => ({ detail: "Erro na API" }));
           setMessages((prev) => [
             ...prev,
-            { role: "assistant", content: `Erro: ${err.detail}`, parts: [] },
+            { role: "assistant", content: "Algo deu errado. Tente enviar sua pergunta novamente.", parts: [] },
           ]);
           setIsStreaming(false);
           return;
@@ -120,9 +131,12 @@ export function useChat() {
         updateAssistantMessage();
       } catch (e) {
         if ((e as Error).name !== "AbortError") {
+          const msg = (e as Error).message?.includes("fetch")
+            ? "Sem conexão com o servidor. Verifique sua internet e tente novamente."
+            : "Algo deu errado. Tente enviar sua pergunta novamente.";
           setMessages((prev) => [
             ...prev,
-            { role: "assistant", content: `Erro: ${(e as Error).message}`, parts: [] },
+            { role: "assistant", content: msg, parts: [] },
           ]);
         }
       } finally {
@@ -227,7 +241,7 @@ export function useChat() {
               ...prev,
               {
                 role: "assistant",
-                content: `Erro: ${(data.detail as string) ?? "desconhecido"}`,
+                content: "Algo deu errado durante a resposta. Tente enviar sua pergunta novamente.",
                 parts: [],
               },
             ]);

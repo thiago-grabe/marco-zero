@@ -1,13 +1,45 @@
 /**
  * API client tipado para o backend Tenor.
- * Token injetado automaticamente via Supabase (prod) ou dev bypass.
+ *
+ * - Token injetado automaticamente
+ * - Auto-renova token em caso de 401 (Signature expired, etc.)
+ * - Erros traduzidos para português user-friendly
  */
 
-import { getToken } from "@/lib/auth";
+import { getToken, renewAuth } from "@/lib/auth";
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? "/api";
 
-async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+/** Traduz erros técnicos da API para mensagens que o usuário entende. */
+function friendlyError(status: number, detail: string): string {
+  // Nunca mostrar detalhes técnicos ao usuário
+  if (status === 401 || detail.toLowerCase().includes("token")) {
+    return "Sua sessão expirou. Estamos renovando automaticamente — tente novamente.";
+  }
+  if (status === 422) {
+    // Validação — tentar extrair algo útil
+    if (detail.includes("taxa_mensal") || detail.includes("gt")) {
+      return "Verifique os valores informados. Algum campo está fora do esperado.";
+    }
+    return "Verifique os dados informados e tente novamente.";
+  }
+  if (status === 404) {
+    return "Não encontramos esse registro. Pode ter sido removido.";
+  }
+  if (status === 409) {
+    return "Esse registro já existe.";
+  }
+  if (status >= 500) {
+    return "Algo deu errado no servidor. Tente novamente em alguns segundos.";
+  }
+  if (detail.includes("Failed to fetch") || detail.includes("NetworkError")) {
+    return "Sem conexão com o servidor. Verifique sua internet e tente novamente.";
+  }
+  // Fallback genérico — nunca mostrar o detail técnico
+  return "Algo deu errado. Tente novamente.";
+}
+
+async function apiFetch<T>(path: string, options: RequestInit = {}, _retry = false): Promise<T> {
   const token = await getToken();
 
   const res = await fetch(`${BASE_URL}${path}`, {
@@ -19,9 +51,18 @@ async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> 
     },
   });
 
+  // Auto-renova token em caso de 401 (expirado, secret mudou, etc.)
+  if (res.status === 401 && !_retry) {
+    const renewed = await renewAuth();
+    if (renewed) {
+      return apiFetch<T>(path, options, true); // retry com novo token
+    }
+  }
+
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(error.detail ?? `HTTP ${res.status}`);
+    const raw = await res.json().catch(() => ({ detail: res.statusText }));
+    const detail = raw.detail ?? raw.message ?? res.statusText;
+    throw new Error(friendlyError(res.status, detail));
   }
 
   if (res.status === 204) return undefined as T;

@@ -2,8 +2,8 @@
  * Auth silencioso — sem tela de login.
  *
  * Na primeira visita, cria uma conta anônima automaticamente.
- * O token é armazenado no localStorage. O backend continua
- * validando JWT e aplicando RLS normalmente.
+ * Se o token expirar ou ficar inválido, recria automaticamente.
+ * O usuário nunca vê erro de autenticação.
  */
 
 const TOKEN_KEY = "mz-token";
@@ -43,13 +43,9 @@ export async function getToken(): Promise<string | null> {
 }
 
 /**
- * Garante que o usuário tem um token válido.
- * Se não tem, cria uma conta anônima automaticamente.
- * Chamado uma vez pelo root layout.
+ * Cria uma conta anônima e armazena o token.
  */
-export async function ensureAuth(): Promise<void> {
-  if (isAuthenticated()) return;
-
+async function createAnonymousAccount(): Promise<boolean> {
   const anonId = crypto.randomUUID().slice(0, 8);
   const email = `anon-${anonId}@tenor.local`;
   const password = crypto.randomUUID();
@@ -64,9 +60,29 @@ export async function ensureAuth(): Promise<void> {
     if (res.ok) {
       const data = await res.json();
       setAuth(data.token, { user_id: data.user_id, email: data.email });
+      return true;
     }
   } catch {
-    // Silencioso — se o backend não estiver disponível, o usuário
-    // verá erros de fetch mas não uma tela de login bloqueante.
+    // Backend indisponível
   }
+  return false;
+}
+
+/**
+ * Garante que o usuário tem um token válido.
+ * Se não tem, cria conta anônima. Chamado pelo root layout.
+ */
+export async function ensureAuth(): Promise<void> {
+  if (isAuthenticated()) return;
+  await createAnonymousAccount();
+}
+
+/**
+ * Renova o token quando recebe 401.
+ * Limpa o token antigo, cria nova conta, retorna true se conseguiu.
+ * Chamado automaticamente pelo API client quando recebe 401.
+ */
+export async function renewAuth(): Promise<boolean> {
+  clearAuth();
+  return createAnonymousAccount();
 }
