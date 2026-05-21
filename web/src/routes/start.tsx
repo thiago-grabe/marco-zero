@@ -1,3 +1,4 @@
+import { HomeLink } from "@/components/layout/HomeLink";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -64,9 +65,7 @@ function Start() {
 
   return (
     <div className="min-h-screen bg-background px-6 py-10 max-w-lg mx-auto">
-      <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-        ← Voltar
-      </Link>
+      <HomeLink />
 
       <div className="mt-8 mb-8">
         <h1 className="font-serif text-2xl font-semibold mb-2">

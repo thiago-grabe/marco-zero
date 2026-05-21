@@ -1,4 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { HomeLink } from "@/components/layout/HomeLink";
 import { useEffect, useState, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useActiveContract } from "@/hooks/useContract";
@@ -98,9 +99,7 @@ function Scenarios() {
   return (
     <div className="min-h-screen bg-background">
       <nav className="flex items-center justify-between px-6 py-4 border-b border-border">
-        <Link to="/dashboard" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-          ← Dashboard
-        </Link>
+        <HomeLink />
         <span className="font-serif text-sm font-semibold">Cenários</span>
         <button
           onClick={() => setShowForm(true)}
@@ -145,8 +144,8 @@ function Scenarios() {
               label="Aporte mensal extra"
               value={sliders.aporte_mensal_extra}
               min={0}
-              max={20000}
-              step={500}
+              max={5000}
+              step={50}
               onChange={(v) => setSliders((s) => ({ ...s, aporte_mensal_extra: v }))}
             />
 
@@ -154,8 +153,8 @@ function Scenarios() {
               label="Aporte anual extra"
               value={sliders.aporte_anual_extra}
               min={0}
-              max={100000}
-              step={5000}
+              max={10000}
+              step={200}
               onChange={(v) => setSliders((s) => ({ ...s, aporte_anual_extra: v }))}
             />
 
@@ -310,20 +309,58 @@ function SliderField({
   step: number;
   onChange: (v: number) => void;
 }) {
+  const [editing, setEditing] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+
+  function startEditing() {
+    setInputValue(value > 0 ? String(value) : "");
+    setEditing(true);
+  }
+
+  function finishEditing() {
+    const parsed = parseFloat(inputValue.replace(",", ".").replace(/[^\d.]/g, "")) || 0;
+    onChange(Math.max(0, parsed)); // sem limite max no input — aceita valor quebrado
+    setEditing(false);
+  }
+
   return (
     <div className="mb-5">
       <div className="flex justify-between items-center mb-2">
         <label className="text-xs text-muted-foreground">{label}</label>
-        <span className="font-serif text-sm tabular-nums text-foreground">
-          {value > 0 ? formatBRL(value) : "Sem aporte"}
-        </span>
+        {editing ? (
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground">R$</span>
+            <input
+              type="text"
+              inputMode="decimal"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onBlur={finishEditing}
+              onKeyDown={(e) => e.key === "Enter" && finishEditing()}
+              autoFocus
+              className="w-24 bg-muted border border-primary rounded px-2 py-1
+                         text-sm text-foreground text-right font-serif tabular-nums
+                         focus:outline-none"
+            />
+          </div>
+        ) : (
+          <button
+            onClick={startEditing}
+            className="font-serif text-sm tabular-nums text-foreground
+                       hover:text-primary transition-colors cursor-text
+                       border-b border-dashed border-transparent hover:border-primary/40"
+            title="Clique para digitar um valor"
+          >
+            {value > 0 ? formatBRL(value) : "Sem aporte"}
+          </button>
+        )}
       </div>
       <input
         type="range"
         min={min}
         max={max}
         step={step}
-        value={value}
+        value={Math.min(value, max)}
         onChange={(e) => onChange(Number(e.target.value))}
         className="w-full accent-primary"
       />

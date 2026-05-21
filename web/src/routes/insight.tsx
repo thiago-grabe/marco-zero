@@ -1,3 +1,4 @@
+import { HomeLink } from "@/components/layout/HomeLink";
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useActiveContract } from "@/hooks/useContract";
@@ -54,9 +55,12 @@ function Insight() {
 
   return (
     <div className="min-h-screen bg-background px-6 py-10 max-w-lg mx-auto">
-      <p className="text-xs text-muted-foreground mb-4">
-        {contract.banco.toUpperCase()} · {contract.sistema_amortizacao}
-      </p>
+      <div className="flex items-center justify-between mb-6">
+        <HomeLink />
+        <p className="text-xs text-muted-foreground">
+          {contract.banco.toUpperCase()} · {contract.sistema_amortizacao}
+        </p>
+      </div>
 
       {/* Alertas de dados fora do padrão */}
       {alertas.filter((a) => !dismissedAlerts.has(a.tipo)).map((alerta) => (

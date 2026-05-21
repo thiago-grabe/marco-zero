@@ -1,3 +1,4 @@
+import { HomeLink } from "@/components/layout/HomeLink";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useCreateContract } from "@/hooks/useContract";
@@ -128,6 +129,8 @@ function Onboarding() {
   if (step === 0) {
     return (
       <div className="min-h-screen bg-background px-6 py-10 max-w-lg mx-auto">
+        <HomeLink />
+        <div className="mt-4" />
         <ProgressDots step={0} total={4} />
         <p className="text-xs text-muted-foreground uppercase tracking-widest mb-2">Passo 1 de 4</p>
         <h1 className="font-serif text-2xl font-semibold mb-1">Onde está seu contrato?</h1>

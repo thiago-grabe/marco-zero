@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useActiveContract } from "@/hooks/useContract";
@@ -9,6 +9,7 @@ import { scenariosApi, type ScenarioResponse } from "@/lib/api/client";
 import { formatBRL, formatMonthYear } from "@/lib/utils";
 import type { ChatAction } from "@/components/chat/types";
 import { Sparkles } from "lucide-react";
+import { HomeLink } from "@/components/layout/HomeLink";
 
 export const Route = createFileRoute("/chat")({
   component: ChatPage,
@@ -112,9 +113,7 @@ function ChatPage() {
     <div className="h-screen bg-background flex flex-col">
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-3 border-b border-border shrink-0">
-        <Link to="/dashboard" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-          ← Dashboard
-        </Link>
+        <HomeLink />
         <div className="flex items-center gap-3">
           <span className="font-serif text-sm font-semibold">
             {isScenarioMode ? "Sobre o plano" : "Tire suas dúvidas"}

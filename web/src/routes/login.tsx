@@ -1,3 +1,4 @@
+import { HomeLink } from "@/components/layout/HomeLink";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { isAuthenticated, setAuth } from "@/lib/auth";
@@ -62,7 +63,7 @@ function Login() {
     <div className="min-h-screen bg-background flex items-center justify-center px-6">
       <div className="max-w-sm w-full">
         <div className="text-center mb-10">
-          <img src="/brand/logo-dark.svg" alt="Tenor" className="h-6 mx-auto mb-6" />
+          <div className="flex justify-center mb-6"><HomeLink className="h-6" /></div>
           <h1 className="font-serif text-2xl font-semibold mb-2">
             {isRegister ? "Criar conta" : "Entrar"}
           </h1>

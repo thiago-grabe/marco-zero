@@ -6,6 +6,7 @@ import { useContractStore } from "@/stores/contract";
 import { scenariosApi } from "@/lib/api/client";
 import { formatBRL, formatMonthYear } from "@/lib/utils";
 import { MessageSquare, Sparkles, BarChart3, Plus, TrendingDown } from "lucide-react";
+import { HomeLink } from "@/components/layout/HomeLink";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -50,7 +51,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <nav className="flex items-center justify-between px-6 py-4 border-b border-border">
-        <img src="/brand/logo-dark.svg" alt="Tenor" className="h-5" />
+        <HomeLink />
         {contracts && contracts.length > 1 && (
           <select
             value={activeContractId ?? ""}
