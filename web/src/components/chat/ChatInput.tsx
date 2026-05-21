@@ -51,7 +51,7 @@ export function ChatInput({ onSend, isStreaming, prefill }: ChatInputProps) {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Pergunte sobre seu financiamento…"
+            placeholder="Escreva sua dúvida com suas palavras…"
             disabled={isStreaming}
             rows={1}
             className="flex-1 bg-muted border border-border rounded-md px-4 py-3 resize-none
@@ -71,7 +71,7 @@ export function ChatInput({ onSend, isStreaming, prefill }: ChatInputProps) {
           </button>
         </div>
         <p className="text-xs text-muted-foreground mt-2 text-center">
-          Números calculados pelo motor SAC — a IA não calcula por conta própria.
+          Todos os números são calculados pelo motor — a IA explica, não inventa.
         </p>
       </div>
     </div>

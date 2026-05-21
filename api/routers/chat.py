@@ -40,6 +40,7 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 class ChatRequest(BaseModel):
     contract_id: str
     message: str
+    mode: str = "massa"  # "massa" (tradutor) ou "nicho" (analista)
 
 
 def _sse(event: str, data: dict | str) -> str:
@@ -102,7 +103,7 @@ async def chat(
 
     contract_context += f"\nUse estes valores como parâmetros ao chamar as ferramentas."
 
-    agent = create_chat_agent()
+    agent = create_chat_agent(mode=body.mode)
 
     # Mensagens: contexto do contrato + pergunta do usuário
     messages = [

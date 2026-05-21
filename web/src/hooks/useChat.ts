@@ -71,7 +71,7 @@ export function useChat() {
             "Content-Type": "application/json",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-          body: JSON.stringify({ contract_id: contractId, message }),
+          body: JSON.stringify({ contract_id: contractId, message, mode: "massa" }),
           signal: abortRef.current.signal,
         });
 

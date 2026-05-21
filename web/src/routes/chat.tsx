@@ -18,21 +18,22 @@ export const Route = createFileRoute("/chat")({
 });
 
 const GENERIC_SUGGESTIONS = [
-  "Quanto economizo amortizando R$ 30 mil?",
-  "E se eu amortizar R$ 5 mil por mês?",
-  "Compare cenários: 3k/mês vs 5k/mês vs 10k/mês",
-  "Quanto pago a mais esperando 15 dias para amortizar?",
-  "Qual a composição da minha parcela atual?",
+  "Por que minha parcela é tão alta?",
+  "Esse seguro que vem na parcela é obrigatório?",
+  "Vale a pena adiantar um pouquinho todo mês?",
+  "Fui enganado na minha taxa de juros?",
+  "O que acontece se eu pagar R$ 200 a mais por mês?",
+  "Por que tão pouco da parcela abate a dívida?",
 ];
 
 function buildScenarioSuggestions(s: ScenarioResponse): string[] {
   const nome = s.nome;
   return [
-    `Esse plano "${nome}" é viável para o meu perfil financeiro?`,
-    `E se eu aumentar o aporte mensal deste plano em 50%?`,
-    `Qual o risco de seguir este plano se eu perder o emprego por 6 meses?`,
-    `Compare o plano "${nome}" com uma versão sem o aporte anual`,
-    `Quanto economizo em juros se antecipar o aporte anual para janeiro?`,
+    `Me explica esse plano "${nome}" como se eu não entendesse nada`,
+    `Se eu seguir esse plano e perder o emprego por 6 meses, o que acontece?`,
+    `Esse plano "${nome}" compromete muito do meu salário?`,
+    `Vale a pena aumentar um pouco o valor mensal desse plano?`,
+    `Tem algum risco que eu não estou vendo nesse plano?`,
   ];
 }
 
@@ -116,7 +117,7 @@ function ChatPage() {
         </Link>
         <div className="flex items-center gap-3">
           <span className="font-serif text-sm font-semibold">
-            {isScenarioMode ? "IA sobre o plano" : "Chat IA"}
+            {isScenarioMode ? "Sobre o plano" : "Tire suas dúvidas"}
           </span>
           {context && (
             <span className="text-xs text-muted-foreground">
@@ -160,10 +161,10 @@ function ChatPage() {
                 {contract.banco.toUpperCase()} · {contract.sistema_amortizacao} · {contract.prazo_remanescente} parcelas
               </p>
               <h2 className="font-serif text-2xl font-semibold text-center mb-2">
-                Pergunte sobre seu contrato
+                Tire suas dúvidas
               </h2>
               <p className="text-sm text-muted-foreground text-center mb-8">
-                O motor calcula; a IA explica. Números nunca são inventados.
+                Pergunte com suas palavras. Eu explico em português e mostro a conta.
               </p>
               <div className="space-y-2">
                 {suggestions.map((s) => (
